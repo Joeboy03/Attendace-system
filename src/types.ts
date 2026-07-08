@@ -8,6 +8,8 @@ export interface User {
   matric_number?: string;
   staff_id?: string;
   level?: string;
+  faculty?: string;
+  department?: string;
   created_at: string;
 }
 

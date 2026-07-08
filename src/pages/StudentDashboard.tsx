@@ -133,10 +133,10 @@ export default function StudentDashboard() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-grow">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-4 flex-grow">
         
         {/* Scanner */}
-        <div className="lg:col-span-2 bg-indigo-900 rounded-3xl p-6 flex flex-col items-center justify-center shadow-lg relative min-h-[400px]">
+        <div className="xl:col-span-4 bg-indigo-900 rounded-3xl p-6 flex flex-col items-center justify-center shadow-lg relative min-h-[350px]">
           <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full flex items-center">
                 <Camera className="w-3 h-3 mr-1" /> SCANNER
@@ -180,11 +180,11 @@ export default function StudentDashboard() {
         </div>
 
         {/* Enrolled Courses */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col">
+        <div className="xl:col-span-5 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm min-h-[350px]">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Enrolled Courses</h2>
           
           {enrolledCourses.length > 0 ? (
-            <div className="space-y-3 flex-grow overflow-y-auto">
+            <div className="space-y-3 flex-grow overflow-y-auto pr-2">
               {enrolledCourses.map((enrollment) => (
                 <div key={enrollment.id} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl flex items-center justify-between hover:border-indigo-200 transition-colors">
                   <div>
@@ -204,6 +204,36 @@ export default function StudentDashboard() {
           )}
         </div>
         
+        {/* Profile Card */}
+        <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm min-h-[350px]">
+          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Student Profile</h2>
+          
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-800 font-bold text-3xl mb-4 shadow-inner">
+              {profile?.full_name?.charAt(0) || 'U'}
+            </div>
+            <h3 className="font-bold text-slate-800 text-lg">{profile?.full_name}</h3>
+            <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mt-2">
+              {profile?.matric_number || 'N/A'}
+            </span>
+          </div>
+          
+          <div className="space-y-4 flex-grow flex flex-col justify-end">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Level</p>
+              <p className="text-sm font-semibold text-slate-700">{profile?.level || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Department</p>
+              <p className="text-sm font-semibold text-slate-700">{profile?.department || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Faculty</p>
+              <p className="text-sm font-semibold text-slate-700">{profile?.faculty || 'N/A'}</p>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">

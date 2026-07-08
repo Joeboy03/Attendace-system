@@ -95,25 +95,24 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-4 flex-grow">
+        
+        {/* Stat Cards */}
+        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><GraduationCap className="w-4 h-4 mr-1" /> Total Students</span>
           <span className="text-5xl font-black text-indigo-900">{stats.students}</span>
         </div>
-        <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
+        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><Users className="w-4 h-4 mr-1" /> Total Lecturers</span>
           <span className="text-5xl font-black text-indigo-900">{stats.lecturers}</span>
         </div>
-        <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
+        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><BookOpen className="w-4 h-4 mr-1" /> Active Courses</span>
           <span className="text-5xl font-black text-indigo-900">{stats.courses}</span>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-grow">
         
         {/* Create Course Form */}
-        <div className="lg:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col">
+        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Create New Course</h2>
           
           {message.text && (
@@ -177,7 +176,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Course List */}
-        <div className="lg:col-span-2 bg-indigo-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="xl:col-span-8 bg-indigo-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
              <h2 className="text-sm font-bold text-indigo-100 uppercase tracking-widest">Course Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">

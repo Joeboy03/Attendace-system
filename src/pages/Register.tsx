@@ -12,6 +12,8 @@ export default function Register() {
   const [matricNumber, setMatricNumber] = useState('');
   const [staffId, setStaffId] = useState('');
   const [level, setLevel] = useState('100 Level');
+  const [faculty, setFaculty] = useState('Faculty of Physical Sciences');
+  const [department, setDepartment] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,9 @@ export default function Register() {
           role: role,
           matric_number: role === 'student' ? matricNumber : null,
           staff_id: role === 'lecturer' ? staffId : null,
-          level: role === 'student' ? level : null
+          level: role === 'student' ? level : null,
+          faculty: role === 'student' ? faculty : null,
+          department: role === 'student' ? department : null
         });
 
         if (dbError) throw dbError;
@@ -131,7 +135,7 @@ export default function Register() {
                                     placeholder="CSC170..."
                                 />
                             </div>
-                            <div>
+                            <div className="mb-4">
                                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                                     Level
                                 </label>
@@ -146,6 +150,39 @@ export default function Register() {
                                     <option value="400 Level">400 Level</option>
                                     <option value="500 Level">500 Level</option>
                                 </select>
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Faculty
+                                </label>
+                                <select
+                                    value={faculty}
+                                    onChange={(e) => setFaculty(e.target.value)}
+                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                                >
+                                    <option value="Faculty of Physical Sciences">Faculty of Physical Sciences</option>
+                                    <option value="Faculty of Life Sciences">Faculty of Life Sciences</option>
+                                    <option value="Faculty of Engineering">Faculty of Engineering</option>
+                                    <option value="Faculty of Arts">Faculty of Arts</option>
+                                    <option value="Faculty of Education">Faculty of Education</option>
+                                    <option value="Faculty of Law">Faculty of Law</option>
+                                    <option value="Faculty of Medical Sciences">Faculty of Medical Sciences</option>
+                                    <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                                    <option value="Faculty of Management Sciences">Faculty of Management Sciences</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Department
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={department}
+                                    onChange={(e) => setDepartment(e.target.value)}
+                                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                                    placeholder="e.g. Computer Science"
+                                />
                             </div>
                         </>
                     ) : (
