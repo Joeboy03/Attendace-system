@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Course, AttendanceSession } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
-import { LogOut, QrCode, Users, PlusCircle, TrendingUp } from 'lucide-react';
+import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export default function LecturerDashboard() {
@@ -202,6 +202,105 @@ export default function LecturerDashboard() {
       fetchRecentAttendees(selectedCourse);
     } catch (error) {
       console.error('Error ending session:', error);
+    }
+  };
+
+  const handleExport = async (formatType: 'csv' | 'pdf') => {
+    if (!selectedCourse) return;
+    try {
+      const { data: sessions, error: sessionError } = await supabase
+        .from('attendance_sessions')
+        .select('id, created_at')
+        .eq('course_id', selectedCourse)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (sessionError || !sessions || sessions.length === 0) {
+        alert("No sessions found to export.");
+        return;
+      }
+
+      const sessionId = sessions[0].id;
+      const sessionDate = format(new Date(sessions[0].created_at), 'yyyy-MM-dd');
+
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select(`
+          id,
+          scanned_at,
+          users (
+            full_name,
+            matric_number,
+            level,
+            faculty,
+            department
+          )
+        `)
+        .eq('session_id', sessionId)
+        .order('scanned_at', { ascending: false });
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        alert("No attendance records found for the latest session.");
+        return;
+      }
+      
+      const course = courses.find(c => c.id === selectedCourse);
+      const courseCode = course ? course.course_code : 'Course';
+
+      if (formatType === 'csv') {
+        const headers = ['Name', 'Matric Number', 'Level', 'Faculty', 'Department', 'Time Scanned', 'Status'];
+        const csvContent = [
+          headers.join(','),
+          ...data.map((record: any) => [
+            `"${record.users?.full_name || 'N/A'}"`,
+            `"${record.users?.matric_number || 'N/A'}"`,
+            `"${record.users?.level || 'N/A'}"`,
+            `"${record.users?.faculty || 'N/A'}"`,
+            `"${record.users?.department || 'N/A'}"`,
+            `"${format(new Date(record.scanned_at), 'h:mm:ss a')}"`,
+            '"PRESENT"'
+          ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `${courseCode}_Attendance_${sessionDate}.csv`);
+        a.click();
+      } else {
+        const { jsPDF } = await import('jspdf');
+        const autoTable = (await import('jspdf-autotable')).default;
+        
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text(`Attendance Report: ${courseCode}`, 14, 22);
+        doc.setFontSize(11);
+        doc.text(`Date: ${sessionDate}`, 14, 30);
+        
+        const tableColumn = ["Name", "Matric No.", "Level", "Dept", "Time", "Status"];
+        const tableRows = data.map((record: any) => [
+          record.users?.full_name || 'N/A',
+          record.users?.matric_number || 'N/A',
+          record.users?.level || 'N/A',
+          record.users?.department || 'N/A',
+          format(new Date(record.scanned_at), 'h:mm:ss a'),
+          'PRESENT'
+        ]);
+        
+        autoTable(doc, {
+          head: [tableColumn],
+          body: tableRows,
+          startY: 40,
+        });
+        
+        doc.save(`${courseCode}_Attendance_${sessionDate}.pdf`);
+      }
+    } catch (error) {
+      console.error('Error exporting records:', error);
+      alert('Failed to export records.');
     }
   };
 
@@ -418,11 +517,21 @@ export default function LecturerDashboard() {
         {/* Real-time Log */}
         <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden flex flex-col shadow-sm min-h-[250px]">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-widest flex items-center">
-              <Users className="w-4 h-4 mr-2 text-indigo-500" />
-              Class Participation Log
-            </h3>
-            {activeSession && <span className="animate-pulse w-2.5 h-2.5 bg-green-500 rounded-full"></span>}
+            <div className="flex items-center">
+              <h3 className="font-bold text-slate-800 text-sm uppercase tracking-widest flex items-center">
+                <Users className="w-4 h-4 mr-2 text-indigo-500" />
+                Class Participation Log
+              </h3>
+              {activeSession && <span className="animate-pulse w-2.5 h-2.5 bg-green-500 rounded-full ml-3"></span>}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => handleExport('csv')} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+                <Download className="w-3 h-3 mr-1" /> CSV
+              </button>
+              <button onClick={() => handleExport('pdf')} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+                <Download className="w-3 h-3 mr-1" /> PDF
+              </button>
+            </div>
           </div>
           <div className="flex-grow overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[600px]">
