@@ -6,14 +6,64 @@ import { LogOut, Camera, CheckCircle, XCircle } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 export default function StudentDashboard() {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, refreshProfile } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState<{ status: 'success' | 'error', message: string } | null>(null);
 
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    full_name: profile?.full_name || '',
+    matric_number: profile?.matric_number || '',
+    level: profile?.level || '100',
+    faculty: profile?.faculty || '',
+    department: profile?.department || ''
+  });
+  const [profileUpdateMsg, setProfileUpdateMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  
+  useEffect(() => {
+    if (profile) {
+      setProfileForm({
+        full_name: profile.full_name || '',
+        matric_number: profile.matric_number || '',
+        level: profile.level || '100',
+        faculty: profile.faculty || '',
+        department: profile.department || ''
+      });
+    }
+  }, [profile]);
+
   useEffect(() => {
     fetchEnrollments();
   }, [profile]);
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileUpdateMsg(null);
+    if (!profile) return;
+    
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          full_name: profileForm.full_name,
+          matric_number: profileForm.matric_number,
+          level: profileForm.level,
+          faculty: profileForm.faculty,
+          department: profileForm.department
+        })
+        .eq('id', profile.id);
+        
+      if (error) throw error;
+      
+      setProfileUpdateMsg({ type: 'success', text: 'Profile updated successfully!' });
+      await refreshProfile();
+      setTimeout(() => setIsEditingProfile(false), 1500);
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      setProfileUpdateMsg({ type: 'error', text: error.message || 'Failed to update profile' });
+    }
+  };
 
   const fetchEnrollments = async () => {
     if (!profile) return;
@@ -51,6 +101,13 @@ export default function StudentDashboard() {
 
   const onScanSuccess = async (decodedText: string, decodedResult: any) => {
     try {
+      if (!profile?.matric_number) {
+        setScanning(false);
+        setScanResult({ status: 'error', message: 'Please complete your profile (Matric Number required) before marking attendance.' });
+        setIsEditingProfile(true);
+        return;
+      }
+
       // Expecting JSON: { sessionId: "...", token: "..." }
       const data = JSON.parse(decodedText);
       if (!data.sessionId || !data.token) throw new Error("Invalid QR Code format");
@@ -169,7 +226,15 @@ export default function StudentDashboard() {
               </div>
             ) : (
               <button
-                onClick={() => { setScanning(true); setScanResult(null); }}
+                onClick={() => { 
+                  if (!profile?.matric_number) {
+                    setScanResult({ status: 'error', message: 'Please complete your profile (Matric Number required) before scanning.' });
+                    setIsEditingProfile(true);
+                  } else {
+                    setScanning(true); 
+                    setScanResult(null); 
+                  }
+                }}
                 className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-lg text-sm font-bold text-indigo-900 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all transform hover:scale-105"
               >
                 <Camera className="w-5 h-5 mr-2" />
@@ -206,32 +271,125 @@ export default function StudentDashboard() {
         
         {/* Profile Card */}
         <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm min-h-[350px]">
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Student Profile</h2>
-          
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-800 font-bold text-3xl mb-4 shadow-inner">
-              {profile?.full_name?.charAt(0) || 'U'}
-            </div>
-            <h3 className="font-bold text-slate-800 text-lg">{profile?.full_name}</h3>
-            <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mt-2">
-              {profile?.matric_number || 'N/A'}
-            </span>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Student Profile</h2>
+            {!isEditingProfile && (
+              <button 
+                onClick={() => setIsEditingProfile(true)}
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+              >
+                Edit
+              </button>
+            )}
           </div>
           
-          <div className="space-y-4 flex-grow flex flex-col justify-end">
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Level</p>
-              <p className="text-sm font-semibold text-slate-700">{profile?.level || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Department</p>
-              <p className="text-sm font-semibold text-slate-700">{profile?.department || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Faculty</p>
-              <p className="text-sm font-semibold text-slate-700">{profile?.faculty || 'N/A'}</p>
-            </div>
-          </div>
+          {isEditingProfile ? (
+            <form onSubmit={handleProfileUpdate} className="flex flex-col flex-grow text-sm">
+              {profileUpdateMsg && (
+                <div className={`mb-4 p-2 rounded-lg text-xs font-medium ${profileUpdateMsg.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {profileUpdateMsg.text}
+                </div>
+              )}
+              
+              <div className="space-y-3 flex-grow">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={profileForm.full_name} 
+                    onChange={e => setProfileForm({...profileForm, full_name: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Matric Number</label>
+                  <input 
+                    type="text" 
+                    value={profileForm.matric_number} 
+                    onChange={e => setProfileForm({...profileForm, matric_number: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Level</label>
+                  <select
+                    value={profileForm.level}
+                    onChange={e => setProfileForm({...profileForm, level: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="100">100 Level</option>
+                    <option value="200">200 Level</option>
+                    <option value="300">300 Level</option>
+                    <option value="400">400 Level</option>
+                    <option value="500">500 Level</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Faculty</label>
+                  <input 
+                    type="text" 
+                    value={profileForm.faculty} 
+                    onChange={e => setProfileForm({...profileForm, faculty: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Department</label>
+                  <input 
+                    type="text" 
+                    value={profileForm.department} 
+                    onChange={e => setProfileForm({...profileForm, department: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2 mt-4">
+                <button 
+                  type="button"
+                  onClick={() => setIsEditingProfile(false)}
+                  className="flex-1 py-2 px-4 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 py-2 px-4 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <div className="flex flex-col items-center mb-6">
+                <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-800 font-bold text-3xl mb-4 shadow-inner">
+                  {profile?.full_name?.charAt(0) || 'U'}
+                </div>
+                <h3 className="font-bold text-slate-800 text-lg text-center leading-tight">{profile?.full_name}</h3>
+                <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mt-2 text-center">
+                  {profile?.matric_number || 'No Matric Number'}
+                </span>
+              </div>
+              
+              <div className="space-y-4 flex-grow flex flex-col justify-end">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Level</p>
+                  <p className="text-sm font-semibold text-slate-700">{profile?.level || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Department</p>
+                  <p className="text-sm font-semibold text-slate-700">{profile?.department || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Faculty</p>
+                  <p className="text-sm font-semibold text-slate-700">{profile?.faculty || 'N/A'}</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
       </div>
