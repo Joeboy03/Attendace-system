@@ -11,6 +11,7 @@ export default function Register() {
   const [role, setRole] = useState<UserRole>('student');
   const [matricNumber, setMatricNumber] = useState('');
   const [staffId, setStaffId] = useState('');
+  const [level, setLevel] = useState('100 Level');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +39,8 @@ export default function Register() {
           email: email,
           role: role,
           matric_number: role === 'student' ? matricNumber : null,
-          staff_id: role === 'lecturer' ? staffId : null
+          staff_id: role === 'lecturer' ? staffId : null,
+          level: role === 'student' ? level : null
         });
 
         if (dbError) throw dbError;
@@ -116,17 +118,35 @@ export default function Register() {
                 <div className="col-span-2 sm:col-span-1">
                     {role === 'student' ? (
                         <>
-                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                Matric Number
-                            </label>
-                            <input
-                                type="text"
-                                required
-                                value={matricNumber}
-                                onChange={(e) => setMatricNumber(e.target.value)}
-                                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
-                                placeholder="CSC170..."
-                            />
+                            <div className="mb-4">
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Matric Number
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={matricNumber}
+                                    onChange={(e) => setMatricNumber(e.target.value)}
+                                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                                    placeholder="CSC170..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Level
+                                </label>
+                                <select
+                                    value={level}
+                                    onChange={(e) => setLevel(e.target.value)}
+                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                                >
+                                    <option value="100 Level">100 Level</option>
+                                    <option value="200 Level">200 Level</option>
+                                    <option value="300 Level">300 Level</option>
+                                    <option value="400 Level">400 Level</option>
+                                    <option value="500 Level">500 Level</option>
+                                </select>
+                            </div>
                         </>
                     ) : (
                         <>

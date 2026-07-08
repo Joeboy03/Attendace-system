@@ -7,6 +7,7 @@ export interface User {
   role: UserRole;
   matric_number?: string;
   staff_id?: string;
+  level?: string;
   created_at: string;
 }
 

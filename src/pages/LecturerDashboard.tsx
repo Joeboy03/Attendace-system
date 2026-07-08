@@ -14,6 +14,7 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [sessionStats, setSessionStats] = useState<any[]>([]);
+  const [recentAttendees, setRecentAttendees] = useState<any[]>([]);
 
   useEffect(() => {
     fetchCourses();
@@ -33,11 +34,50 @@ export default function LecturerDashboard() {
         setSelectedCourse(data[0].id);
         fetchActiveSession(data[0].id);
         fetchSessionStats(data[0].id);
+        fetchRecentAttendees(data[0].id);
       }
     } catch (error) {
       console.error('Error fetching courses:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentAttendees = async (courseId: string) => {
+    try {
+      const { data: sessions, error: sessionError } = await supabase
+        .from('attendance_sessions')
+        .select('id')
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (sessionError || !sessions || sessions.length === 0) {
+        setRecentAttendees([]);
+        return;
+      }
+
+      const sessionId = sessions[0].id;
+
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select(`
+          id,
+          scanned_at,
+          users (
+            full_name,
+            matric_number,
+            level
+          )
+        `)
+        .eq('session_id', sessionId)
+        .order('scanned_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setRecentAttendees(data || []);
+    } catch (error) {
+      console.error('Error fetching recent attendees:', error);
     }
   };
 
@@ -115,6 +155,7 @@ export default function LecturerDashboard() {
       if (error) throw error;
       setActiveSession(data);
       fetchSessionStats(selectedCourse); // Refresh stats
+      fetchRecentAttendees(selectedCourse);
     } catch (error) {
       console.error('Error starting session:', error);
     }
@@ -131,6 +172,7 @@ export default function LecturerDashboard() {
       if (error) throw error;
       setActiveSession(null);
       fetchSessionStats(selectedCourse); // Refresh stats
+      fetchRecentAttendees(selectedCourse);
     } catch (error) {
       console.error('Error ending session:', error);
     }
@@ -182,6 +224,8 @@ export default function LecturerDashboard() {
                 onChange={(e) => {
                   setSelectedCourse(e.target.value);
                   fetchActiveSession(e.target.value);
+                  fetchSessionStats(e.target.value);
+                  fetchRecentAttendees(e.target.value);
                 }}
                 disabled={activeSession !== null}
               >
@@ -312,6 +356,60 @@ export default function LecturerDashboard() {
               No attendance data available for this course yet.
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Real-time Log */}
+      <div className="mt-4 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden flex flex-col shadow-sm">
+        <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+          <h3 className="font-bold text-slate-800 text-sm uppercase tracking-widest flex items-center">
+            <Users className="w-4 h-4 mr-2 text-indigo-500" />
+            Class Participation Log
+          </h3>
+          {activeSession && <span className="animate-pulse w-2.5 h-2.5 bg-green-500 rounded-full"></span>}
+        </div>
+        <div className="p-0 overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Student Name</th>
+                <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Matric Number</th>
+                <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Level</th>
+                <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Time Scanned</th>
+                <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentAttendees.length > 0 ? (
+                recentAttendees.map((record, i) => (
+                  <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td className="p-4 text-sm font-bold text-slate-800 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
+                        {record.users?.full_name?.charAt(0) || '?'}
+                      </div>
+                      {record.users?.full_name || 'Unknown'}
+                    </td>
+                    <td className="p-4 text-xs font-medium text-slate-600">{record.users?.matric_number || 'N/A'}</td>
+                    <td className="p-4">
+                      <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md">
+                        {record.users?.level || 'N/A'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-xs font-medium text-slate-500">{format(new Date(record.scanned_at), 'h:mm:ss a')}</td>
+                    <td className="p-4 text-right">
+                      <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md">PRESENT</span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-slate-400 font-medium text-sm">
+                    No recent attendance records found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
