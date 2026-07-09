@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { LogOut, Shield, Users, BookOpen, PlusCircle, GraduationCap, CheckCircle, XCircle, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import Calendar from '../components/Calendar';
+import AdminSearch from '../components/AdminSearch';
 import { ClassSchedule } from '../types';
 import { fetchSchedules, createSchedule } from '../lib/schedules';
 
@@ -165,6 +166,11 @@ export default function AdminDashboard() {
         <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><BookOpen className="w-4 h-4 mr-1" /> Active Courses</span>
           <span className="text-5xl font-black text-indigo-900">{stats.courses}</span>
+        </div>
+        
+        {/* Unified Search Section */}
+        <div className="xl:col-span-12">
+          <AdminSearch />
         </div>
         
         {/* Create Course Form */}
