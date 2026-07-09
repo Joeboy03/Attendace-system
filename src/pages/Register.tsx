@@ -114,9 +114,7 @@ export default function Register() {
             <UserPlus className="w-8 h-8 rotate-3" />
           </div>
           
-          <h2 className="text-2xl font-bold tracking-tight text-white mb-1">
-            Create Account
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white mb-1">Student Registration</h2>
           <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-8">
             Attendance Management System
           </p>
@@ -249,7 +247,7 @@ export default function Register() {
               disabled={loading}
               className="w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-bold text-[#18191B] bg-[#60D8B6] hover:bg-[#4bc2a0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#60D8B6] focus:ring-offset-[#232427] disabled:opacity-50 transition-colors mt-6"
             >
-              {loading ? 'Creating Account...' : 'Register Account'}
+              {loading ? 'Creating Student Account...' : 'Register as Student'}
             </button>
           </form>
 
