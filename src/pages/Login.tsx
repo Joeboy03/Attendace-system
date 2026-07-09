@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from 'react';
 import { GraduationCap } from 'lucide-react';
 
 export default function Login() {
@@ -9,6 +11,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
+
+  useEffect(() => {
+    if (user && profile) {
+      navigate('/dashboard');
+    }
+  }, [user, profile, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

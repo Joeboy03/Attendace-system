@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { GraduationCap, UserPlus } from 'lucide-react';
 import { UserRole } from '../types';
 import { fetchFaculties, fetchDepartments } from '../lib/departments';
@@ -43,6 +44,13 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user, profile, refreshProfile } = useAuth();
+
+  useEffect(() => {
+    if (user && profile) {
+      navigate('/dashboard');
+    }
+  }, [user, profile, navigate]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +81,7 @@ export default function Register() {
         });
 
         if (dbError) throw dbError;
+        await refreshProfile();
         
         // Registration successful
         navigate('/dashboard');
@@ -137,7 +146,7 @@ export default function Register() {
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value as UserRole)}
-                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
                   >
                     <option value="student">Student</option>
                     <option value="lecturer">Lecturer</option>
@@ -167,7 +176,7 @@ export default function Register() {
                                 <select
                                     value={level}
                                     onChange={(e) => setLevel(e.target.value)}
-                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
                                 >
                                     <option value="100 Level">100 Level</option>
                                     <option value="200 Level">200 Level</option>
@@ -181,9 +190,10 @@ export default function Register() {
                                     Faculty
                                 </label>
                                 <select
+                                    required
                                     value={faculty}
                                     onChange={(e) => { setFaculty(e.target.value); setDepartment(''); }}
-                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
                                 >
                                     <option value="" disabled>Select Faculty</option>
                                     {facultiesList.map(fac => (
@@ -199,7 +209,7 @@ export default function Register() {
                                     required
                                     value={department}
                                     onChange={(e) => setDepartment(e.target.value)}
-                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
                                     disabled={!faculty}
                                 >
                                     <option value="" disabled>Select Department</option>
