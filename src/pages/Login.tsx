@@ -100,7 +100,7 @@ export default function Login() {
           <div className="mt-6 text-center w-full pt-6 border-t border-slate-800">
             <p className="text-sm text-slate-400 font-medium mb-2">New to the system?</p>
             <Link to="/register" className="text-sm font-bold text-[#60D8B6] hover:text-[#4bc2a0] transition-colors">
-                Create a Student or Lecturer Account
+                Create a Student Account
             </Link>
           </div>
         </div>

@@ -12,9 +12,9 @@ export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('student');
+  const role = 'student';
   const [matricNumber, setMatricNumber] = useState('');
-  const [staffId, setStaffId] = useState('');
+  
   const [level, setLevel] = useState('100 Level');
   const [faculty, setFaculty] = useState('');
   const [department, setDepartment] = useState('');
@@ -30,7 +30,7 @@ export default function Register() {
       // Here faculty is the ID or Name. In our schema, it should probably be the name since we save string in DB, but the ID is better for fetching.
       // For simplicity, assuming `faculty` state holds the faculty name. But fetchDepartments takes ID.
       // Let's modify fetchDepartments to be called with ID if needed. Wait, faculty state is currently Name.
-      const f = facultiesList.find(fac => fac.name === faculty);
+      const f = facultiesList.find(fac => fac.name.toLowerCase() === faculty.toLowerCase());
       if (f) {
         fetchDepartments(f.id).then(setDepartmentsList);
       } else {
@@ -57,8 +57,24 @@ export default function Register() {
     setLoading(true);
     setError(null);
     
+
+    const selectedFac = facultiesList.find(f => f.name.toLowerCase() === faculty.toLowerCase());
+    if (!selectedFac) {
+      setError('The entered faculty does not exist.');
+      setLoading(false);
+      return;
+    }
+    
+    const selectedDept = departmentsList.find(d => d.name.toLowerCase() === department.toLowerCase());
+    if (!selectedDept) {
+      setError('The entered department does not exist in the selected faculty.');
+      setLoading(false);
+      return;
+    }
+    
     try {
       // 1. Create the user in Supabase Auth
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -72,12 +88,12 @@ export default function Register() {
           id: authData.user.id,
           full_name: fullName,
           email: email,
-          role: role,
-          matric_number: role === 'student' ? matricNumber : null,
-          staff_id: role === 'lecturer' ? staffId : null,
-          level: role === 'student' ? level : null,
-          faculty: role === 'student' ? faculty : null,
-          department: role === 'student' ? department : null
+          role: 'student',
+          matric_number: matricNumber,
+          staff_id: null,
+          level: level,
+          faculty: selectedFac.name,
+          department: selectedDept.name
         });
 
         if (dbError) throw dbError;
@@ -138,103 +154,78 @@ export default function Register() {
               />
             </div>
 
+            <div className="mb-4">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Matric Number
+                </label>
+                <input
+                    type="text"
+                    required
+                    value={matricNumber}
+                    onChange={(e) => setMatricNumber(e.target.value)}
+                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
+                    placeholder="CSC170..."
+                />
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Role
-                  </label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as UserRole)}
-                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
-                  >
-                    <option value="student">Student</option>
-                    <option value="lecturer">Lecturer</option>
-                  </select>
+                <div className="mb-4">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        Level
+                    </label>
+                    <select
+                        value={level}
+                        onChange={(e) => setLevel(e.target.value)}
+                        className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
+                    >
+                        <option value="100 Level">100 Level</option>
+                        <option value="200 Level">200 Level</option>
+                        <option value="300 Level">300 Level</option>
+                        <option value="400 Level">400 Level</option>
+                        <option value="500 Level">500 Level</option>
+                    </select>
                 </div>
 
-                <div className="col-span-2 sm:col-span-1">
-                    {role === 'student' ? (
-                        <>
-                            <div className="mb-4">
-                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                    Matric Number
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={matricNumber}
-                                    onChange={(e) => setMatricNumber(e.target.value)}
-                                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
-                                    placeholder="CSC170..."
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                    Level
-                                </label>
-                                <select
-                                    value={level}
-                                    onChange={(e) => setLevel(e.target.value)}
-                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
-                                >
-                                    <option value="100 Level">100 Level</option>
-                                    <option value="200 Level">200 Level</option>
-                                    <option value="300 Level">300 Level</option>
-                                    <option value="400 Level">400 Level</option>
-                                    <option value="500 Level">500 Level</option>
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                    Faculty
-                                </label>
-                                <select
-                                    required
-                                    value={faculty}
-                                    onChange={(e) => { setFaculty(e.target.value); setDepartment(''); }}
-                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
-                                >
-                                    <option value="" disabled>Select Faculty</option>
-                                    {facultiesList.map(fac => (
-                                      <option key={fac.id} value={fac.name}>{fac.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                    Department
-                                </label>
-                                <select
-                                    required
-                                    value={department}
-                                    onChange={(e) => setDepartment(e.target.value)}
-                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors appearance-none"
-                                    disabled={!faculty}
-                                >
-                                    <option value="" disabled>Select Department</option>
-                                    {departmentsList.map(dept => (
-                                      <option key={dept.id} value={dept.name}>{dept.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                Staff ID
-                            </label>
-                            <input
-                                type="text"
-                                required
-                                value={staffId}
-                                onChange={(e) => setStaffId(e.target.value)}
-                                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
-                                placeholder="L-12345"
-                            />
-                        </>
-                    )}
+                <div className="mb-4">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        Faculty
+                    </label>
+                    <input
+                        type="text"
+                        required
+                        list="faculty-list"
+                        value={faculty}
+                        onChange={(e) => { setFaculty(e.target.value); setDepartment(''); }}
+                        placeholder="Type faculty name"
+                        className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors"
+                    />
+                    <datalist id="faculty-list">
+                        {facultiesList.map(fac => (
+                          <option key={fac.id} value={fac.name} />
+                        ))}
+                    </datalist>
                 </div>
+            </div>
+            
+            <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Department
+                </label>
+                <input
+                    type="text"
+                    required
+                    list="dept-list"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    placeholder="Type department name"
+                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white transition-colors disabled:opacity-50"
+                    disabled={!faculty}
+                />
+                <datalist id="dept-list">
+                    {departmentsList.map(dept => (
+                      <option key={dept.id} value={dept.name} />
+                    ))}
+                </datalist>
             </div>
 
             <div>
@@ -260,7 +251,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-bold text-[#18191B] bg-[#60D8B6] hover:bg-[#4bc2a0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#60D8B6] focus:ring-offset-[#232427] disabled:opacity-50 transition-colors mt-6"
             >
               {loading ? 'Creating Account...' : 'Register Account'}
             </button>
@@ -273,10 +264,9 @@ export default function Register() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+        <p className="mt-8 text-center text-[11px] text-slate-500 uppercase font-bold tracking-wider">
           © 2024 University of Benin • CSC Final Year Project
         </p>
-
       </div>
     </div>
   );

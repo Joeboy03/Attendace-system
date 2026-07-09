@@ -8,7 +8,7 @@ export const fetchFaculties = async (): Promise<Faculty[]> => {
   try {
     const { data, error } = await supabase.from('faculties').select('*').order('name');
     if (error) {
-      if (error.code === '42P01') {
+      if (error.code === '42P01' || error.code === 'PGRST205') {
         return getLocalFaculties();
       }
       throw error;
@@ -28,7 +28,7 @@ export const fetchDepartments = async (facultyId?: string): Promise<Department[]
     }
     const { data, error } = await query;
     if (error) {
-      if (error.code === '42P01') {
+      if (error.code === '42P01' || error.code === 'PGRST205') {
         return getLocalDepartments(facultyId);
       }
       throw error;
@@ -48,7 +48,7 @@ export const createFaculty = async (name: string): Promise<Faculty> => {
       .select('*')
       .single();
     if (error) {
-      if (error.code === '42P01') {
+      if (error.code === '42P01' || error.code === 'PGRST205') {
         return addLocalFaculty(name);
       }
       throw error;
@@ -68,7 +68,7 @@ export const createDepartment = async (name: string, facultyId: string): Promise
       .select('*, faculty:faculty_id(name)')
       .single();
     if (error) {
-      if (error.code === '42P01') {
+      if (error.code === '42P01' || error.code === 'PGRST205') {
         return addLocalDepartment(name, facultyId);
       }
       throw error;
@@ -84,7 +84,7 @@ export const deleteFaculty = async (id: string): Promise<void> => {
   try {
     const { error } = await supabase.from('faculties').delete().eq('id', id);
     if (error) {
-      if (error.code === '42P01') {
+      if (error.code === '42P01' || error.code === 'PGRST205') {
         removeLocalFaculty(id);
         return;
       }
@@ -100,7 +100,7 @@ export const deleteDepartment = async (id: string): Promise<void> => {
   try {
     const { error } = await supabase.from('departments').delete().eq('id', id);
     if (error) {
-      if (error.code === '42P01') {
+      if (error.code === '42P01' || error.code === 'PGRST205') {
         removeLocalDepartment(id);
         return;
       }

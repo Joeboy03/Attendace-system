@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, Shield, Users, BookOpen, PlusCircle, GraduationCap, CheckCircle, XCircle, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { LogOut, Shield, Users, UserPlus, BookOpen, PlusCircle, GraduationCap, CheckCircle, XCircle, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import Calendar from '../components/Calendar';
 import AdminSearch from '../components/AdminSearch';
 import AdminDepartments from '../components/AdminDepartments';
@@ -10,6 +10,15 @@ import { fetchSchedules, createSchedule } from '../lib/schedules';
 
 export default function AdminDashboard() {
   const { profile, signOut } = useAuth();
+  
+  // Lecturer State
+  const [newLecturerName, setNewLecturerName] = useState('');
+  const [newLecturerEmail, setNewLecturerEmail] = useState('');
+  const [newLecturerPassword, setNewLecturerPassword] = useState('');
+  const [newLecturerStaffId, setNewLecturerStaffId] = useState('');
+  const [lecturerLoading, setLecturerLoading] = useState(false);
+  const [lecturerMessage, setLecturerMessage] = useState({ type: '', text: '' });
+
   const [stats, setStats] = useState({ students: 0, lecturers: 0, courses: 0 });
   const [lecturers, setLecturers] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
@@ -63,6 +72,47 @@ export default function AdminDashboard() {
       if (courseData) setCourses(courseData);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  
+  const handleCreateLecturer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLecturerLoading(true);
+    setLecturerMessage({ type: '', text: '' });
+    
+    try {
+      // Create user in auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newLecturerEmail,
+        password: newLecturerPassword,
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // Add to users table
+        const { error: dbError } = await supabase.from('users').insert({
+          id: authData.user.id,
+          full_name: newLecturerName,
+          email: newLecturerEmail,
+          role: 'lecturer',
+          staff_id: newLecturerStaffId,
+        });
+
+        if (dbError) throw dbError;
+        
+        setLecturerMessage({ type: 'success', text: 'Lecturer created successfully! Note: You may have been logged out due to client-side auth limits.' });
+        setNewLecturerName('');
+        setNewLecturerEmail('');
+        setNewLecturerPassword('');
+        setNewLecturerStaffId('');
+        fetchDashboardData();
+      }
+    } catch (error: any) {
+      setLecturerMessage({ type: 'error', text: error.message || 'Failed to create lecturer.' });
+    } finally {
+      setLecturerLoading(false);
     }
   };
 
@@ -178,6 +228,78 @@ export default function AdminDashboard() {
           <AdminDepartments />
         </div>
         
+        
+        {/* Create Lecturer Form */}
+        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
+          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Create Lecturer</h2>
+          
+          {lecturerMessage.text && (
+            <div className={`mb-6 p-4 rounded-xl flex items-start ${lecturerMessage.type === 'success' ? 'bg-green-100 text-green-800 border-2 border-green-200' : 'bg-red-100 text-red-800 border-2 border-red-200'}`}>
+              {lecturerMessage.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+              )}
+              <p className="font-medium text-sm">{lecturerMessage.text}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleCreateLecturer} className="space-y-4 flex-grow">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Full Name</label>
+              <input
+                type="text"
+                required
+                value={newLecturerName}
+                onChange={(e) => setNewLecturerName(e.target.value)}
+                placeholder="e.g. Dr. Jane Smith"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Staff ID</label>
+              <input
+                type="text"
+                required
+                value={newLecturerStaffId}
+                onChange={(e) => setNewLecturerStaffId(e.target.value)}
+                placeholder="e.g. L-12345"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Email address</label>
+              <input
+                type="email"
+                required
+                value={newLecturerEmail}
+                onChange={(e) => setNewLecturerEmail(e.target.value)}
+                placeholder="lecturer@uniben.edu"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Password</label>
+              <input
+                type="password"
+                required
+                value={newLecturerPassword}
+                onChange={(e) => setNewLecturerPassword(e.target.value)}
+                placeholder="Assign password"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={lecturerLoading}
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+            >
+              <UserPlus className="w-5 h-5 mr-2" />
+              {lecturerLoading ? 'Creating...' : 'Add Lecturer'}
+            </button>
+          </form>
+        </div>
+
         {/* Create Course Form */}
         <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Create New Course</h2>
