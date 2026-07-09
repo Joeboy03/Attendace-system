@@ -242,6 +242,12 @@ export default function StudentDashboard() {
             >
               <Camera className="w-4 h-4" /> Scan QR Code
             </button>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors"
+            >
+              <LogOut className="w-4 h-4" /> Sign Out
+            </button>
           </div>
         </div>
 
