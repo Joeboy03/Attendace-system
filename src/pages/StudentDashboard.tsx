@@ -223,28 +223,28 @@ export default function StudentDashboard() {
     fetchAttendanceHistory();
   }, [profile]);
   return (
-    <div className="min-h-screen bg-[#18191B] text-slate-300 font-sans p-6 flex flex-col gap-6">
+    <div className="min-h-screen bg-slate-50 text-slate-600 font-sans p-6 flex flex-col gap-6">
       
       {/* Top Section - Student Profile */}
-      <div className="bg-[#232427] rounded-3xl p-8 border border-slate-800">
+      <div className="bg-white rounded-3xl p-8 border border-slate-200">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-1.5 h-6 bg-[#60D8B6] rounded-full"></div>
-            <h2 className="text-xl font-bold text-white">Student Profile</h2>
+            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
+            <h2 className="text-xl font-bold text-purple-900">Student Profile</h2>
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors text-white">
-              This Year <ChevronDown className="w-4 h-4 text-slate-400" />
+            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors text-purple-900">
+              This Year <ChevronDown className="w-4 h-4 text-slate-500" />
             </button>
             <button 
               onClick={() => setScanning(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#60D8B6] text-slate-900 rounded-xl text-sm font-bold hover:bg-[#4bc2a0] transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-purple-900 text-white rounded-xl text-sm font-bold hover:bg-purple-800 transition-colors"
             >
               <Camera className="w-4 h-4" /> Scan QR Code
             </button>
             <button
               onClick={signOut}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-sm font-bold hover:bg-red-500/20 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 border border-red-200 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors"
             >
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
@@ -253,23 +253,23 @@ export default function StudentDashboard() {
 
         <div className="flex flex-col lg:flex-row gap-8 items-start mb-8">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-inner">
+            <div className="w-20 h-20 bg-purple-900 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-inner">
               {profile?.full_name?.charAt(0) || 'U'}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white mb-3">{profile?.full_name || 'Student Name'}</h3>
+              <h3 className="text-xl font-bold text-purple-900 mb-3">{profile?.full_name || 'Student Name'}</h3>
               <div className="flex flex-wrap gap-x-12 gap-y-4">
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Matric Number</p>
-                  <p className="text-sm font-medium text-white">{profile?.matric_number || 'N/A'}</p>
+                  <p className="text-sm font-medium text-purple-900">{profile?.matric_number || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Level / Department</p>
-                  <p className="text-sm font-medium text-white">{profile?.level} • {profile?.department || 'N/A'}</p>
+                  <p className="text-sm font-medium text-purple-900">{profile?.level} • {profile?.department || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Email Address</p>
-                  <p className="text-sm font-medium text-white">{profile?.email || 'N/A'}</p>
+                  <p className="text-sm font-medium text-purple-900">{profile?.email || 'N/A'}</p>
                 </div>
               </div>
             </div>
@@ -278,43 +278,43 @@ export default function StudentDashboard() {
 
         {/* Stats row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#2D2E32] rounded-2xl p-4 flex items-center gap-4 border border-slate-800">
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+          <div className="bg-white rounded-2xl p-4 flex items-center gap-4 border border-slate-200">
+            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-slate-500">
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">{attendanceHistory.length}</p>
-              <p className="text-xs text-slate-400">Total Classes Attended</p>
+              <p className="text-lg font-bold text-purple-900">{attendanceHistory.length}</p>
+              <p className="text-xs text-slate-500">Total Classes Attended</p>
             </div>
           </div>
           
-          <div className="bg-[#2D2E32] rounded-2xl p-4 flex items-center gap-4 border border-slate-800">
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+          <div className="bg-white rounded-2xl p-4 flex items-center gap-4 border border-slate-200">
+            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-slate-500">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">{enrolledCourses.length}</p>
-              <p className="text-xs text-slate-400">Enrolled Courses</p>
+              <p className="text-lg font-bold text-purple-900">{enrolledCourses.length}</p>
+              <p className="text-xs text-slate-500">Enrolled Courses</p>
             </div>
           </div>
           
-          <div className="bg-[#2D2E32] rounded-2xl p-4 flex items-center gap-4 border border-slate-800">
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+          <div className="bg-white rounded-2xl p-4 flex items-center gap-4 border border-slate-200">
+            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-slate-500">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">{schedules.length}</p>
-              <p className="text-xs text-slate-400">Upcoming Classes</p>
+              <p className="text-lg font-bold text-purple-900">{schedules.length}</p>
+              <p className="text-xs text-slate-500">Upcoming Classes</p>
             </div>
           </div>
           
-          <div className="bg-[#2D2E32] rounded-2xl p-4 flex items-center gap-4 border border-slate-800">
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+          <div className="bg-white rounded-2xl p-4 flex items-center gap-4 border border-slate-200">
+            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-slate-500">
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Active</p>
-              <p className="text-xs text-slate-400">Student Status</p>
+              <p className="text-lg font-bold text-purple-900">Active</p>
+              <p className="text-xs text-slate-500">Student Status</p>
             </div>
           </div>
         </div>
@@ -322,19 +322,19 @@ export default function StudentDashboard() {
 
       {/* QR Scanner Modal / Section */}
       {scanning && (
-        <div className="bg-[#232427] rounded-3xl p-8 border border-slate-800">
+        <div className="bg-white rounded-3xl p-8 border border-slate-200">
           <div className="flex justify-between items-center mb-6">
              <div className="flex items-center gap-3">
-               <div className="w-1.5 h-6 bg-[#60D8B6] rounded-full"></div>
-               <h2 className="text-xl font-bold text-white">Scan Class QR Code</h2>
+               <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
+               <h2 className="text-xl font-bold text-purple-900">Scan Class QR Code</h2>
              </div>
-             <button onClick={() => setScanning(false)} className="text-slate-400 hover:text-white">
+             <button onClick={() => setScanning(false)} className="text-slate-500 hover:text-purple-900">
                <XCircle className="w-6 h-6" />
              </button>
           </div>
           
           {scanResult && (
-            <div className={`mb-6 p-4 rounded-xl flex items-start ${scanResult.status === 'success' ? 'bg-[#60D8B6]/20 text-[#60D8B6] border border-[#60D8B6]/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+            <div className={`mb-6 p-4 rounded-xl flex items-start ${scanResult.status === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
               {scanResult.status === 'success' ? (
                 <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
               ) : (
@@ -344,33 +344,33 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          <div className="bg-[#18191B] p-4 rounded-2xl border border-slate-800 mx-auto max-w-md">
-            <div id="reader" className="w-full rounded-xl overflow-hidden [&>div]:border-none [&_video]:rounded-xl text-slate-300"></div>
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mx-auto max-w-md">
+            <div id="reader" className="w-full rounded-xl overflow-hidden [&>div]:border-none [&_video]:rounded-xl text-slate-600"></div>
           </div>
         </div>
       )}
 
       {/* Bottom Section - Attendance History */}
-      <div className="bg-[#232427] rounded-3xl p-8 border border-slate-800 flex-grow">
+      <div className="bg-white rounded-3xl p-8 border border-slate-200 flex-grow">
         <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-1.5 h-6 bg-[#60D8B6] rounded-full"></div>
-            <h2 className="text-xl font-bold text-white">Attendance History</h2>
+            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
+            <h2 className="text-xl font-bold text-purple-900">Attendance History</h2>
           </div>
           
           <div className="flex gap-3">
-            <div className="flex bg-[#18191B] p-1 rounded-xl border border-slate-800">
-              <button className="p-2 rounded-lg bg-[#2D2E32] text-white">
+            <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200">
+              <button className="p-2 rounded-lg bg-white text-purple-900">
                 <LayoutGrid className="w-4 h-4" />
               </button>
-              <button className="p-2 rounded-lg text-slate-500 hover:text-white">
+              <button className="p-2 rounded-lg text-slate-500 hover:text-purple-900">
                 <List className="w-4 h-4" />
               </button>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors text-white">
+            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors text-purple-900">
               <ArrowUpDown className="w-4 h-4" /> Sort
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors text-white">
+            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors text-purple-900">
               <Filter className="w-4 h-4" /> Filter
             </button>
           </div>
@@ -391,13 +391,13 @@ export default function StudentDashboard() {
               const status = "On Time";
               
               return (
-                <div key={record.id} className="bg-[#2D2E32] rounded-2xl p-5 border border-slate-800 hover:border-slate-600 transition-colors">
+                <div key={record.id} className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-purple-300 transition-colors">
                   <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-2 text-white font-medium">
-                      <CalendarIcon className="w-4 h-4 text-slate-400" />
+                    <div className="flex items-center gap-2 text-purple-900 font-medium">
+                      <CalendarIcon className="w-4 h-4 text-slate-500" />
                       {formattedDate}
                     </div>
-                    <span className="px-3 py-1 bg-[#60D8B6]/10 text-[#60D8B6] text-xs font-bold rounded-full">
+                    <span className="px-3 py-1 bg-purple-900/10 text-purple-600 text-xs font-bold rounded-full">
                       {status}
                     </span>
                   </div>
@@ -405,11 +405,11 @@ export default function StudentDashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Course Code</p>
-                      <p className="text-sm font-bold text-white">{record.attendance_sessions?.courses?.course_code || 'N/A'}</p>
+                      <p className="text-sm font-bold text-purple-900">{record.attendance_sessions?.courses?.course_code || 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Check In Time</p>
-                      <p className="text-sm font-bold text-white">{formattedTime}</p>
+                      <p className="text-sm font-bold text-purple-900">{formattedTime}</p>
                     </div>
                   </div>
                 </div>
@@ -424,7 +424,7 @@ export default function StudentDashboard() {
             {[1, 2, 3, 4, '...', 8, 9, 10].map((page, idx) => (
               <button 
                 key={idx} 
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium ${page === 1 ? 'border border-slate-600 text-white' : 'text-slate-500 hover:text-white'}`}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium ${page === 1 ? 'border border-slate-600 text-purple-900' : 'text-slate-500 hover:text-purple-900'}`}
               >
                 {page}
               </button>

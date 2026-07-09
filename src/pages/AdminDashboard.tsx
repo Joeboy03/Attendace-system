@@ -260,20 +260,20 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-6 flex flex-col">
       <header className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-900 rounded-full flex items-center justify-center text-white font-bold text-xl">U</div>
+          <div className="w-12 h-12 bg-purple-900 rounded-full flex items-center justify-center text-white font-bold text-xl">U</div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-indigo-900">University of Benin</h1>
+            <h1 className="text-xl font-bold tracking-tight text-purple-900">University of Benin</h1>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Attendance Management System</p>
           </div>
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-slate-800">{profile?.full_name}</p>
-            <p className="text-xs text-indigo-600 font-medium flex items-center justify-end"><Shield className="w-3 h-3 mr-1" /> Administrator</p>
+            <p className="text-xs text-purple-600 font-medium flex items-center justify-end"><Shield className="w-3 h-3 mr-1" /> Administrator</p>
           </div>
           <button 
             onClick={signOut}
-            className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700 hover:bg-indigo-200 transition-colors"
+            className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-700 hover:bg-purple-200 transition-colors"
             title="Sign Out"
           >
             <LogOut className="w-5 h-5" />
@@ -286,19 +286,19 @@ export default function AdminDashboard() {
         {/* Stat Cards */}
         <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><Shield className="w-4 h-4 mr-1" /> Total Admins</span>
-          <span className="text-5xl font-black text-indigo-900">{stats.admins}</span>
+          <span className="text-5xl font-black text-purple-900">{stats.admins}</span>
         </div>
         <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><GraduationCap className="w-4 h-4 mr-1" /> Total Students</span>
-          <span className="text-5xl font-black text-indigo-900">{stats.students}</span>
+          <span className="text-5xl font-black text-purple-900">{stats.students}</span>
         </div>
         <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><Users className="w-4 h-4 mr-1" /> Total Lecturers</span>
-          <span className="text-5xl font-black text-indigo-900">{stats.lecturers}</span>
+          <span className="text-5xl font-black text-purple-900">{stats.lecturers}</span>
         </div>
         <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col items-center justify-center shadow-sm">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center"><BookOpen className="w-4 h-4 mr-1" /> Active Courses</span>
-          <span className="text-5xl font-black text-indigo-900">{stats.courses}</span>
+          <span className="text-5xl font-black text-purple-900">{stats.courses}</span>
         </div>
         
         {/* Unified Search Section */}
@@ -335,7 +335,7 @@ export default function AdminDashboard() {
                 value={newAdminName}
                 onChange={(e) => setNewAdminName(e.target.value)}
                 placeholder="e.g. Admin Jane"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div>
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
                 value={newAdminEmail}
                 onChange={(e) => setNewAdminEmail(e.target.value)}
                 placeholder="admin@uniben.edu"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div>
@@ -357,13 +357,13 @@ export default function AdminDashboard() {
                 value={newAdminPassword}
                 onChange={(e) => setNewAdminPassword(e.target.value)}
                 placeholder="Assign password"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <button
               type="submit"
               disabled={adminLoading}
-              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-purple-900 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors mt-6"
             >
               <Shield className="w-5 h-5 mr-2" />
               {adminLoading ? 'Creating...' : 'Add Admin'}
@@ -372,9 +372,9 @@ export default function AdminDashboard() {
         </div>
 
         {/* Admin Directory */}
-        <div className="xl:col-span-8 bg-indigo-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
-             <h2 className="text-sm font-bold text-indigo-100 uppercase tracking-widest">Admin Directory</h2>
+             <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Admin Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
                 {admins.length} ADMINS
              </span>
@@ -387,7 +387,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center space-x-3 mb-1">
                       <p className="text-sm font-bold text-white">{admin.full_name}</p>
                     </div>
-                    <p className="text-xs font-medium text-indigo-200">{admin.email}</p>
+                    <p className="text-xs font-medium text-purple-200">{admin.email}</p>
                   </div>
                   {profile?.id !== admin.id && (
                     <button 
@@ -402,7 +402,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : (
-            <div className="flex-grow flex flex-col items-center justify-center text-indigo-300 opacity-70">
+            <div className="flex-grow flex flex-col items-center justify-center text-purple-300 opacity-70">
               <Shield className="w-16 h-16 mb-4" />
               <p className="text-sm font-bold text-center">No admins found.</p>
             </div>
@@ -433,7 +433,7 @@ export default function AdminDashboard() {
                 value={newLecturerName}
                 onChange={(e) => setNewLecturerName(e.target.value)}
                 placeholder="e.g. Dr. Jane Smith"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div>
@@ -444,7 +444,7 @@ export default function AdminDashboard() {
                 value={newLecturerStaffId}
                 onChange={(e) => setNewLecturerStaffId(e.target.value)}
                 placeholder="e.g. L-12345"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div>
@@ -455,7 +455,7 @@ export default function AdminDashboard() {
                 value={newLecturerEmail}
                 onChange={(e) => setNewLecturerEmail(e.target.value)}
                 placeholder="lecturer@uniben.edu"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div>
@@ -466,13 +466,13 @@ export default function AdminDashboard() {
                 value={newLecturerPassword}
                 onChange={(e) => setNewLecturerPassword(e.target.value)}
                 placeholder="Assign password"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <button
               type="submit"
               disabled={lecturerLoading}
-              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-purple-900 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors mt-6"
             >
               <UserPlus className="w-5 h-5 mr-2" />
               {lecturerLoading ? 'Creating...' : 'Add Lecturer'}
@@ -482,9 +482,9 @@ export default function AdminDashboard() {
 
 
         {/* Lecturer Directory */}
-        <div className="xl:col-span-8 bg-indigo-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
-             <h2 className="text-sm font-bold text-indigo-100 uppercase tracking-widest">Lecturer Directory</h2>
+             <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Lecturer Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
                 {lecturers.length} LECTURERS
              </span>
@@ -495,10 +495,10 @@ export default function AdminDashboard() {
                 <div key={lecturer.id} className="p-4 bg-white/10 border-2 border-white/10 rounded-2xl flex items-center justify-between hover:border-white/30 transition-colors">
                   <div>
                     <div className="flex items-center space-x-3 mb-1">
-                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-900 text-[10px] font-black rounded-md">{lecturer.staff_id || 'NO ID'}</span>
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-900 text-[10px] font-black rounded-md">{lecturer.staff_id || 'NO ID'}</span>
                       <p className="text-sm font-bold text-white">{lecturer.full_name}</p>
                     </div>
-                    <p className="text-xs font-medium text-indigo-200">{lecturer.email}</p>
+                    <p className="text-xs font-medium text-purple-200">{lecturer.email}</p>
                   </div>
                   <button 
                     onClick={() => handleDeleteLecturer(lecturer.id)}
@@ -511,7 +511,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : (
-            <div className="flex-grow flex flex-col items-center justify-center text-indigo-300 opacity-70">
+            <div className="flex-grow flex flex-col items-center justify-center text-purple-300 opacity-70">
               <Users className="w-16 h-16 mb-4" />
               <p className="text-sm font-bold text-center">No lecturers have been created yet.</p>
             </div>
@@ -543,7 +543,7 @@ export default function AdminDashboard() {
                 value={newCourseCode}
                 onChange={(e) => setNewCourseCode(e.target.value)}
                 placeholder="e.g. CSC411"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors uppercase"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors uppercase"
               />
             </div>
             <div>
@@ -554,7 +554,7 @@ export default function AdminDashboard() {
                 value={newCourseTitle}
                 onChange={(e) => setNewCourseTitle(e.target.value)}
                 placeholder="e.g. Software Engineering"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div>
@@ -563,7 +563,7 @@ export default function AdminDashboard() {
                 required
                 value={selectedLecturer}
                 onChange={(e) => setSelectedLecturer(e.target.value)}
-                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
               >
                 <option value="" disabled>Select a Lecturer...</option>
                 {lecturers.map(l => (
@@ -575,7 +575,7 @@ export default function AdminDashboard() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-purple-900 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors mt-6"
             >
               <PlusCircle className="w-5 h-5 mr-2" />
               {loading ? 'Creating...' : 'Add Course'}
@@ -584,9 +584,9 @@ export default function AdminDashboard() {
         </div>
 
         {/* Course List */}
-        <div className="xl:col-span-8 bg-indigo-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
-             <h2 className="text-sm font-bold text-indigo-100 uppercase tracking-widest">Course Directory</h2>
+             <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Course Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
                 {courses.length} REGISTERED
              </span>
@@ -598,10 +598,10 @@ export default function AdminDashboard() {
                 <div key={course.id} className="p-4 bg-white/10 border-2 border-white/10 rounded-2xl flex items-center justify-between hover:border-white/30 transition-colors">
                   <div>
                     <div className="flex items-center space-x-3 mb-1">
-                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-900 text-[10px] font-black rounded-md">{course.course_code}</span>
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-900 text-[10px] font-black rounded-md">{course.course_code}</span>
                       <p className="text-sm font-bold text-white">{course.course_title}</p>
                     </div>
-                    <p className="text-xs font-medium text-indigo-200 flex items-center mt-2">
+                    <p className="text-xs font-medium text-purple-200 flex items-center mt-2">
                       <Users className="w-3 h-3 mr-1" />
                       {course.lecturer?.full_name || 'Unassigned'}
                     </p>
@@ -610,7 +610,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : (
-            <div className="flex-grow flex flex-col items-center justify-center text-indigo-300 opacity-70">
+            <div className="flex-grow flex flex-col items-center justify-center text-purple-300 opacity-70">
               <BookOpen className="w-16 h-16 mb-4" />
               <p className="text-sm font-bold text-center">No courses have been created yet.</p>
             </div>
@@ -642,7 +642,7 @@ export default function AdminDashboard() {
                 required
                 value={scheduleCourseId}
                 onChange={(e) => setScheduleCourseId(e.target.value)}
-                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
               >
                 <option value="" disabled>Select a Course...</option>
                 {courses.map(c => (
@@ -657,7 +657,7 @@ export default function AdminDashboard() {
                 required
                 value={scheduleDate}
                 onChange={(e) => setScheduleDate(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -668,7 +668,7 @@ export default function AdminDashboard() {
                   required
                   value={scheduleStartTime}
                   onChange={(e) => setScheduleStartTime(e.target.value)}
-                  className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                  className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
                 />
               </div>
               <div>
@@ -678,7 +678,7 @@ export default function AdminDashboard() {
                   required
                   value={scheduleEndTime}
                   onChange={(e) => setScheduleEndTime(e.target.value)}
-                  className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                  className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
                 />
               </div>
             </div>
@@ -689,13 +689,13 @@ export default function AdminDashboard() {
                 value={scheduleLocation}
                 onChange={(e) => setScheduleLocation(e.target.value)}
                 placeholder="e.g. Hall 2"
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
               />
             </div>
             <button
               type="submit"
               disabled={scheduleLoading}
-              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-purple-900 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors mt-6"
             >
               <CalendarIcon className="w-5 h-5 mr-2" />
               {scheduleLoading ? 'Scheduling...' : 'Schedule Class'}

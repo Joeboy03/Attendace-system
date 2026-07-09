@@ -127,7 +127,7 @@ export default function AdminDepartments() {
   if (loading) {
     return (
       <div className="bg-white rounded-3xl border-2 border-slate-200 p-8 flex items-center justify-center min-h-[300px]">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
       </div>
     );
   }
@@ -135,8 +135,8 @@ export default function AdminDepartments() {
   return (
     <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm">
       <div className="flex items-center mb-6">
-        <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center mr-4">
-          <Building2 className="w-5 h-5 text-indigo-700" />
+        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mr-4">
+          <Building2 className="w-5 h-5 text-purple-700" />
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-800">Department Management</h2>
@@ -169,12 +169,12 @@ export default function AdminDepartments() {
               value={newFacultyName}
               onChange={(e) => setNewFacultyName(e.target.value)}
               placeholder="New Faculty Name"
-              className="flex-1 px-4 py-2 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400"
+              className="flex-1 px-4 py-2 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400"
             />
             <button
               type="submit"
               disabled={isSubmitting || !newFacultyName.trim()}
-              className="px-4 py-2 bg-indigo-900 text-white rounded-xl text-sm font-bold hover:bg-indigo-800 disabled:opacity-50 transition-colors flex items-center"
+              className="px-4 py-2 bg-purple-900 text-white rounded-xl text-sm font-bold hover:bg-purple-800 disabled:opacity-50 transition-colors flex items-center"
             >
               <PlusCircle className="w-4 h-4 mr-1.5" />
               Add
@@ -186,7 +186,7 @@ export default function AdminDepartments() {
               <p className="text-sm text-slate-500 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">No faculties found.</p>
             ) : (
               faculties.map(faculty => (
-                <div key={faculty.id} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-200 transition-colors">
+                <div key={faculty.id} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-purple-200 transition-colors">
                   <span className="text-sm font-bold text-slate-700">{faculty.name}</span>
                   <button
                     onClick={() => handleDeleteFaculty(faculty.id)}
@@ -209,7 +209,7 @@ export default function AdminDepartments() {
             <select
               value={selectedFacultyId}
               onChange={(e) => setSelectedFacultyId(e.target.value)}
-              className="w-full px-4 py-2 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 rounded-xl bg-slate-50 text-slate-900"
+              className="w-full px-4 py-2 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 text-slate-900"
             >
               <option value="">Select Faculty...</option>
               {faculties.map(f => (
@@ -222,12 +222,12 @@ export default function AdminDepartments() {
                 value={newDepartmentName}
                 onChange={(e) => setNewDepartmentName(e.target.value)}
                 placeholder="New Department Name"
-                className="flex-1 px-4 py-2 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400"
+                className="flex-1 px-4 py-2 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400"
               />
               <button
                 type="submit"
                 disabled={isSubmitting || !newDepartmentName.trim() || !selectedFacultyId}
-                className="px-4 py-2 bg-indigo-900 text-white rounded-xl text-sm font-bold hover:bg-indigo-800 disabled:opacity-50 transition-colors flex items-center"
+                className="px-4 py-2 bg-purple-900 text-white rounded-xl text-sm font-bold hover:bg-purple-800 disabled:opacity-50 transition-colors flex items-center"
               >
                 <PlusCircle className="w-4 h-4 mr-1.5" />
                 Add
@@ -240,7 +240,7 @@ export default function AdminDepartments() {
               <p className="text-sm text-slate-500 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">No departments found.</p>
             ) : (
               departments.map(dept => (
-                <div key={dept.id} className="flex flex-col p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-200 transition-colors">
+                <div key={dept.id} className="flex flex-col p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-purple-200 transition-colors">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-bold text-slate-700">{dept.name}</span>
                     <button

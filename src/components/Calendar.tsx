@@ -64,18 +64,18 @@ export default function Calendar({ schedules, onDateSelect }: CalendarProps) {
                 key={i} 
                 onClick={() => handleDateClick(day)}
                 className={`min-h-[80px] p-2 rounded-xl border-2 cursor-pointer transition-all ${
-                  isSelected ? 'border-indigo-500 bg-indigo-50/50' : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
+                  isSelected ? 'border-purple-500 bg-purple-50/50' : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
                 } ${!isCurrentMonth ? 'opacity-40' : ''}`}
               >
                 <div className={`text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full mb-1 ${
                   isToday(day) && !isSelected ? 'bg-slate-800 text-white' : 
-                  isSelected ? 'bg-indigo-600 text-white' : 'text-slate-700'
+                  isSelected ? 'bg-purple-600 text-white' : 'text-slate-700'
                 }`}>
                   {format(day, 'd')}
                 </div>
                 <div className="space-y-1 overflow-y-auto max-h-[40px] hide-scrollbar">
                   {daySchedules.map((schedule, idx) => (
-                    <div key={idx} className="w-full h-1.5 bg-indigo-500 rounded-full mb-1" title={schedule.title} />
+                    <div key={idx} className="w-full h-1.5 bg-purple-500 rounded-full mb-1" title={schedule.title} />
                   ))}
                 </div>
               </div>
@@ -93,17 +93,17 @@ export default function Calendar({ schedules, onDateSelect }: CalendarProps) {
           {selectedDaySchedules.length > 0 ? (
             selectedDaySchedules.map(schedule => (
               <div key={schedule.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group">
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500 rounded-l-2xl"></div>
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-500 rounded-l-2xl"></div>
                 <h4 className="font-bold text-sm text-slate-800 mb-1">{schedule.course?.course_code || schedule.title}</h4>
                 <p className="text-xs font-semibold text-slate-500 mb-2 truncate">{schedule.course?.course_title || 'Class Session'}</p>
                 <div className="space-y-1.5">
                   <div className="flex items-center text-[11px] font-medium text-slate-600">
-                    <Clock className="w-3.5 h-3.5 mr-1.5 text-indigo-400" />
+                    <Clock className="w-3.5 h-3.5 mr-1.5 text-purple-400" />
                     {format(parseISO(schedule.start_time), 'h:mm a')} - {format(parseISO(schedule.end_time), 'h:mm a')}
                   </div>
                   {schedule.location && (
                     <div className="flex items-center text-[11px] font-medium text-slate-600">
-                      <MapPin className="w-3.5 h-3.5 mr-1.5 text-indigo-400" />
+                      <MapPin className="w-3.5 h-3.5 mr-1.5 text-purple-400" />
                       {schedule.location}
                     </div>
                   )}
@@ -112,7 +112,7 @@ export default function Calendar({ schedules, onDateSelect }: CalendarProps) {
             ))
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-slate-400 opacity-70">
-              <Clock className="w-12 h-12 mb-3 text-slate-300" />
+              <Clock className="w-12 h-12 mb-3 text-slate-600" />
               <p className="text-xs font-bold text-center">No classes scheduled<br/>for this date.</p>
             </div>
           )}

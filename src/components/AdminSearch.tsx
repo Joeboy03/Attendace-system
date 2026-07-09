@@ -122,7 +122,7 @@ export default function AdminSearch() {
               }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center ${
                 category === cat.id 
-                  ? 'bg-indigo-900 text-white shadow-sm' 
+                  ? 'bg-purple-900 text-white shadow-sm' 
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
             >
@@ -139,13 +139,13 @@ export default function AdminSearch() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder={`Search ${category}...`}
-          className="w-full pl-12 pr-4 py-4 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-2xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+          className="w-full pl-12 pr-4 py-4 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-2xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
         />
         <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
         <button
           type="submit"
           disabled={loading || !searchTerm.trim()}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 disabled:opacity-50 transition-colors"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
         </button>
@@ -159,7 +159,7 @@ export default function AdminSearch() {
           </div>
         ) : loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+            <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
           </div>
         ) : results.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
@@ -172,7 +172,7 @@ export default function AdminSearch() {
               Found {results.length} result{results.length !== 1 && 's'}
             </p>
             {results.map((result, idx) => (
-              <div key={result.id || idx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-indigo-200 transition-colors">
+              <div key={result.id || idx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-purple-200 transition-colors">
                 
                 {category === 'students' && (
                   <>
@@ -211,7 +211,7 @@ export default function AdminSearch() {
                   <>
                     <div>
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="px-2 py-0.5 bg-indigo-100 text-indigo-900 text-[10px] font-black rounded-md">
+                        <span className="px-2 py-0.5 bg-purple-100 text-purple-900 text-[10px] font-black rounded-md">
                           {result.course_code}
                         </span>
                         <h4 className="font-bold text-slate-800 text-sm">{result.course_title}</h4>
