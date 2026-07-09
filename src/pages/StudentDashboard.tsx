@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Course } from '../types';
 import { LogOut, Camera, CheckCircle, XCircle } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { facultiesData } from '../data/faculties';
 
 export default function StudentDashboard() {
   const { profile, signOut, refreshProfile } = useAuth();
@@ -328,21 +329,32 @@ export default function StudentDashboard() {
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Faculty</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.faculty} 
-                    onChange={e => setProfileForm({...profileForm, faculty: e.target.value})}
+                  <select
+                    value={profileForm.faculty}
+                    onChange={e => setProfileForm({...profileForm, faculty: e.target.value, department: ''})}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
-                  />
+                    required
+                  >
+                    <option value="" disabled>Select Faculty</option>
+                    {Object.keys(facultiesData).map(faculty => (
+                      <option key={faculty} value={faculty}>{faculty}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Department</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.department} 
+                  <select
+                    value={profileForm.department}
                     onChange={e => setProfileForm({...profileForm, department: e.target.value})}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500"
-                  />
+                    required
+                    disabled={!profileForm.faculty}
+                  >
+                    <option value="" disabled>Select Department</option>
+                    {profileForm.faculty && facultiesData[profileForm.faculty as keyof typeof facultiesData]?.map((dept: string) => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               

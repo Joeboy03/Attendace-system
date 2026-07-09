@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, UserPlus } from 'lucide-react';
 import { UserRole } from '../types';
+import { facultiesData } from '../data/faculties';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
@@ -12,7 +13,7 @@ export default function Register() {
   const [matricNumber, setMatricNumber] = useState('');
   const [staffId, setStaffId] = useState('');
   const [level, setLevel] = useState('100 Level');
-  const [faculty, setFaculty] = useState('Faculty of Physical Sciences');
+  const [faculty, setFaculty] = useState('');
   const [department, setDepartment] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -157,32 +158,31 @@ export default function Register() {
                                 </label>
                                 <select
                                     value={faculty}
-                                    onChange={(e) => setFaculty(e.target.value)}
+                                    onChange={(e) => { setFaculty(e.target.value); setDepartment(''); }}
                                     className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
                                 >
-                                    <option value="Faculty of Physical Sciences">Faculty of Physical Sciences</option>
-                                    <option value="Faculty of Life Sciences">Faculty of Life Sciences</option>
-                                    <option value="Faculty of Engineering">Faculty of Engineering</option>
-                                    <option value="Faculty of Arts">Faculty of Arts</option>
-                                    <option value="Faculty of Education">Faculty of Education</option>
-                                    <option value="Faculty of Law">Faculty of Law</option>
-                                    <option value="Faculty of Medical Sciences">Faculty of Medical Sciences</option>
-                                    <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
-                                    <option value="Faculty of Management Sciences">Faculty of Management Sciences</option>
+                                    <option value="" disabled>Select Faculty</option>
+                                    {Object.keys(facultiesData).map(fac => (
+                                      <option key={fac} value={fac}>{fac}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                                     Department
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     required
                                     value={department}
                                     onChange={(e) => setDepartment(e.target.value)}
-                                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
-                                    placeholder="e.g. Computer Science"
-                                />
+                                    className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+                                    disabled={!faculty}
+                                >
+                                    <option value="" disabled>Select Department</option>
+                                    {faculty && facultiesData[faculty as keyof typeof facultiesData]?.map((dept: string) => (
+                                      <option key={dept} value={dept}>{dept}</option>
+                                    ))}
+                                </select>
                             </div>
                         </>
                     ) : (
