@@ -15,7 +15,7 @@ export const fetchFaculties = async (): Promise<Faculty[]> => {
     }
     return data as Faculty[];
   } catch (error) {
-    console.error('Error fetching faculties:', error);
+    // silenced
     return getLocalFaculties();
   }
 };
@@ -35,7 +35,7 @@ export const fetchDepartments = async (facultyId?: string): Promise<Department[]
     }
     return data as Department[];
   } catch (error) {
-    console.error('Error fetching departments:', error);
+    // silenced
     return getLocalDepartments(facultyId);
   }
 };
@@ -55,7 +55,7 @@ export const createFaculty = async (name: string): Promise<Faculty> => {
     }
     return data as Faculty;
   } catch (error) {
-    console.error('Error creating faculty:', error);
+    // silenced
     return addLocalFaculty(name);
   }
 };
@@ -75,7 +75,7 @@ export const createDepartment = async (name: string, facultyId: string): Promise
     }
     return data as Department;
   } catch (error) {
-    console.error('Error creating department:', error);
+    // silenced
     return addLocalDepartment(name, facultyId);
   }
 };

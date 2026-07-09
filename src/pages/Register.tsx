@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { GraduationCap, UserPlus } from 'lucide-react';
 import { UserRole } from '../types';
-import { fetchFaculties, fetchDepartments } from '../lib/departments';
+import { fetchFaculties, fetchDepartments, createFaculty, createDepartment } from '../lib/departments';
 import { Faculty, Department } from '../types';
 import { useEffect } from 'react';
 
@@ -58,18 +58,14 @@ export default function Register() {
     setError(null);
     
 
-    const selectedFac = facultiesList.find(f => f.name.toLowerCase() === faculty.toLowerCase());
+    let selectedFac = facultiesList.find(f => f.name.toLowerCase() === faculty.toLowerCase());
     if (!selectedFac) {
-      setError('The entered faculty does not exist.');
-      setLoading(false);
-      return;
+      selectedFac = await createFaculty(faculty);
     }
     
-    const selectedDept = departmentsList.find(d => d.name.toLowerCase() === department.toLowerCase());
-    if (!selectedDept) {
-      setError('The entered department does not exist in the selected faculty.');
-      setLoading(false);
-      return;
+    let selectedDept = departmentsList.find(d => d.name.toLowerCase() === department.toLowerCase());
+    if (!selectedDept && selectedFac) {
+      selectedDept = await createDepartment(department, selectedFac.id);
     }
     
     try {
