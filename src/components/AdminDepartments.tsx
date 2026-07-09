@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Building2, PlusCircle, Trash2, Loader2, AlertCircle } from 'lucide-react';
 import { fetchFaculties, fetchDepartments, createFaculty, createDepartment, deleteFaculty, deleteDepartment } from '../lib/departments';
 import { Faculty, Department } from '../types';
+import { INITIAL_DATA } from '../data/initialDepartments';
 
 export default function AdminDepartments() {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
@@ -13,6 +14,7 @@ export default function AdminDepartments() {
   const [selectedFacultyId, setSelectedFacultyId] = useState('');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,6 +71,38 @@ export default function AdminDepartments() {
     }
   };
 
+  
+  const handleSeedData = async () => {
+    if (!window.confirm('This will auto-populate the database with all faculties and departments. Continue?')) return;
+    setIsSeeding(true);
+    setError(null);
+    try {
+      let currentFaculties = [...faculties];
+      let currentDepartments = [...departments];
+      
+      for (const [facultyName, depts] of Object.entries(INITIAL_DATA)) {
+        let faculty = currentFaculties.find(f => f.name === facultyName);
+        if (!faculty) {
+          faculty = await createFaculty(facultyName);
+          currentFaculties.push(faculty);
+        }
+        
+        for (const deptName of depts) {
+          const deptExists = currentDepartments.find(d => d.name === deptName && d.faculty_id === faculty.id);
+          if (!deptExists) {
+            const dept = await createDepartment(deptName, faculty.id);
+            currentDepartments.push(dept);
+          }
+        }
+      }
+      await loadData();
+    } catch (err: any) {
+      setError(err.message || 'Failed to seed data');
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   const handleDeleteFaculty = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this faculty? This will also delete all associated departments.')) return;
     try {
@@ -108,6 +142,13 @@ export default function AdminDepartments() {
           <h2 className="text-lg font-bold text-slate-800">Department Management</h2>
           <p className="text-xs text-slate-500 font-medium">Manage master list of faculties and departments</p>
         </div>
+        <button
+          onClick={handleSeedData}
+          disabled={isSeeding}
+          className="ml-auto px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
+        >
+          {isSeeding ? 'Seeding...' : 'Auto-Seed Default Data'}
+        </button>
       </div>
 
       {error && (
