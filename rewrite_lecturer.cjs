@@ -1,4 +1,6 @@
+const fs = require('fs');
 
+const code = `
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -6,7 +8,7 @@ import { Course, AttendanceSession, ClassSchedule } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
 import { 
-  LogOut, QrCode, 
+  LogOut, 
   Search, 
   Bell, 
   ChevronDown, 
@@ -78,7 +80,7 @@ export default function LecturerDashboard() {
       const sessionId = sessions[0].id;
       const { data, error } = await supabase
         .from('attendance_records')
-        .select(`
+        .select(\`
           id,
           scanned_at,
           users (
@@ -86,7 +88,7 @@ export default function LecturerDashboard() {
             matric_number,
             department
           )
-        `)
+        \`)
         .eq('session_id', sessionId)
         .order('scanned_at', { ascending: false })
         .limit(4);
@@ -287,7 +289,7 @@ export default function LecturerDashboard() {
               </button>
               <div className="flex items-center gap-2 bg-white rounded-full p-1.5 pr-3 shadow-sm border border-slate-100 cursor-pointer">
                 <div className="w-8 h-8 bg-slate-200 rounded-full overflow-hidden">
-                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.full_name || 'user'}`} alt="Avatar" className="w-full h-full object-cover" />
+                  <img src={\`https://api.dicebear.com/7.x/avataaars/svg?seed=\${profile?.full_name || 'user'}\`} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
                 <ChevronDown size={14} className="text-slate-500" />
               </div>
@@ -430,7 +432,7 @@ export default function LecturerDashboard() {
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 600 }}
-                        tickFormatter={(val) => `${val}k`}
+                        tickFormatter={(val) => \`\${val}k\`}
                       />
                       <Tooltip 
                         cursor={{fill: 'transparent'}}
@@ -438,7 +440,7 @@ export default function LecturerDashboard() {
                       />
                       <Bar dataKey="value" radius={[20, 20, 20, 20]} barSize={40}>
                         {barData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.active ? '#1C7A58' : '#88BEA8'} style={{ opacity: entry.active ? 1 : 0.8 }} />
+                          <Cell key={\`cell-\${index}\`} fill={entry.active ? '#1C7A58' : '#88BEA8'} style={{ opacity: entry.active ? 1 : 0.8 }} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -465,8 +467,8 @@ export default function LecturerDashboard() {
                   </div>
                   
                   <div className="text-center mt-2 mb-4 z-10">
-                    <p className="text-slate-500 text-xs font-medium">Average Attendance</p>
-                    <h3 className="text-[28px] font-bold text-slate-800">86.5%</h3>
+                    <p className="text-slate-500 text-xs font-medium">Total Balance</p>
+                    <h3 className="text-[28px] font-bold text-slate-800">$32,678.90</h3>
                   </div>
 
                   <div className="absolute bottom-0 left-0 right-0 h-[100px]">
@@ -491,62 +493,53 @@ export default function LecturerDashboard() {
                   
                   <div className="absolute bottom-6 left-6 right-6 flex gap-3 z-10">
                     <button className="flex-1 bg-[#1C7A58] text-white py-2.5 rounded-xl text-xs font-bold flex justify-center items-center gap-1 shadow-sm shadow-[#1C7A58]/20">
-                      Export CSV
+                      Send <ArrowUpRight size={14} />
                     </button>
                     <button className="flex-1 bg-white border border-slate-200 text-slate-600 py-2.5 rounded-xl text-xs font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-slate-50">
-                      Export PDF
+                      Receive <ArrowDownRight size={14} />
                     </button>
                   </div>
                 </div>
 
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex-1 flex flex-col justify-between">
-                  {activeSession ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                      <div className="flex justify-between items-center w-full mb-4">
-                        <span className="px-3 py-1 bg-green-100 text-[#1C7A58] text-[10px] font-bold rounded-full flex items-center">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#1C7A58] animate-pulse mr-1.5"></span>
-                          LIVE SESSION
-                        </span>
-                        <span className="text-slate-400 text-[10px] font-mono font-bold bg-slate-100 px-2 py-1 rounded-full">
-                          Ends: {format(new Date(activeSession.expires_at), 'h:mm a')}
-                        </span>
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500">
+                          <Wallet size={16} />
+                        </div>
+                        <div>
+                          <h3 className="text-slate-800 font-bold text-base">Amount of credit</h3>
+                          <p className="text-slate-400 text-xs mt-0.5">Total refund amount with fee</p>
+                        </div>
                       </div>
-                      <div className="bg-white p-2 border border-slate-200 rounded-2xl shadow-sm mb-3">
-                        <QRCodeSVG 
-                           value={JSON.stringify({
-                             sessionId: activeSession.id,
-                             token: activeSession.session_token
-                           })} 
-                           size={120}
-                          level="H"
-                        />
-                      </div>
-                      <p className="text-slate-800 font-mono text-sm font-bold tracking-widest">{activeSession.session_token.split('-')[0].toUpperCase()}</p>
                     </div>
-                  ) : (
-                    <>
-                      <div>
-                        <div className="flex justify-between items-start mb-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500">
-                              <QrCode size={16} />
-                            </div>
-                            <div>
-                              <h3 className="text-slate-800 font-bold text-base">Session QR</h3>
-                              <p className="text-slate-400 text-xs mt-0.5">Start session to view QR</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex flex-col items-center justify-center py-4 opacity-50">
-                          <div className="w-24 h-24 border-4 border-dashed border-slate-200 rounded-2xl flex items-center justify-center mb-3">
-                            <Plus size={24} className="text-slate-400" />
-                          </div>
-                          <p className="text-sm font-bold text-slate-400">No Active Session</p>
-                        </div>
+                    
+                    <div className="flex items-end gap-3 mb-6">
+                      <h3 className="text-4xl font-bold text-slate-800">$8,945<span className="text-2xl text-slate-400">.89</span></h3>
+                      <div className="bg-[#1C7A58] text-white text-[10px] font-bold px-2 py-1 rounded-full mb-1">
+                        +12.8%
                       </div>
-                    </>
-                  )}
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 relative overflow-hidden">
+                    <button className="absolute top-4 right-4 w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors shadow-sm">
+                      <ArrowUpRight size={12} />
+                    </button>
+                    <h4 className="text-sm font-bold text-slate-800 mb-1">Mandatory Payments</h4>
+                    <p className="text-slate-400 text-xs mb-4">Recent payments</p>
+                    
+                    <div className="flex items-center">
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="User" className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 relative z-40" />
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jane" alt="User" className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 -ml-3 relative z-30" />
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mike" alt="User" className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 -ml-3 relative z-20" />
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" alt="User" className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 -ml-3 relative z-10" />
+                      <div className="w-10 h-10 rounded-full border-2 border-white bg-[#1C7A58] text-white text-xs font-bold flex items-center justify-center -ml-3 relative z-0 shadow-sm">
+                        +2
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -633,3 +626,6 @@ const CalendarIcon = ({ size = 24, className = "" }) => (
     <line x1="3" y1="10" x2="21" y2="10"></line>
   </svg>
 );
+`
+
+fs.writeFileSync('src/pages/LecturerDashboard.tsx', code);
