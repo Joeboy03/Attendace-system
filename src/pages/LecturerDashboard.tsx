@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Course, AttendanceSession } from '../types';
+import { Course, AttendanceSession, ClassSchedule } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
-import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download } from 'lucide-react';
+import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download, Calendar as CalendarIcon } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import Calendar from '../components/Calendar';
+import { fetchSchedules } from '../lib/schedules';
 
 export default function LecturerDashboard() {
   const { profile, signOut } = useAuth();
@@ -16,10 +18,19 @@ export default function LecturerDashboard() {
   const [sessionStats, setSessionStats] = useState<any[]>([]);
   const [recentAttendees, setRecentAttendees] = useState<any[]>([]);
   const [demographicStats, setDemographicStats] = useState<{faculty: string, count: number}[]>([]);
+  const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
 
   useEffect(() => {
     fetchCourses();
+    if (profile?.id) {
+      loadSchedules(profile.id);
+    }
   }, [profile]);
+
+  const loadSchedules = async (lecturerId: string) => {
+    const data = await fetchSchedules({ lecturer_id: lecturerId });
+    setSchedules(data);
+  };
 
   const fetchCourses = async () => {
     if (!profile) return;
@@ -579,6 +590,11 @@ export default function LecturerDashboard() {
           </div>
         </div>
 
+      </div>
+
+      <div className="mt-4">
+        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">My Class Schedule</h2>
+        <Calendar schedules={schedules} />
       </div>
 
       <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">

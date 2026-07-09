@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, Shield, Users, BookOpen, PlusCircle, GraduationCap, CheckCircle, XCircle } from 'lucide-react';
+import { LogOut, Shield, Users, BookOpen, PlusCircle, GraduationCap, CheckCircle, XCircle, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import Calendar from '../components/Calendar';
+import { ClassSchedule } from '../types';
+import { fetchSchedules, createSchedule } from '../lib/schedules';
 
 export default function AdminDashboard() {
   const { profile, signOut } = useAuth();
@@ -15,9 +18,26 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  // Schedule state
+  const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
+  const [scheduleCourseId, setScheduleCourseId] = useState('');
+  const [scheduleTitle, setScheduleTitle] = useState('');
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleStartTime, setScheduleStartTime] = useState('');
+  const [scheduleEndTime, setScheduleEndTime] = useState('');
+  const [scheduleLocation, setScheduleLocation] = useState('');
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleMessage, setScheduleMessage] = useState({ type: '', text: '' });
+
   useEffect(() => {
     fetchDashboardData();
+    loadSchedules();
   }, []);
+
+  const loadSchedules = async () => {
+    const data = await fetchSchedules();
+    setSchedules(data);
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -67,6 +87,42 @@ export default function AdminDashboard() {
       setMessage({ type: 'error', text: error.message || 'Failed to create course.' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateSchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setScheduleLoading(true);
+    setScheduleMessage({ type: '', text: '' });
+
+    try {
+      const selectedCourse = courses.find(c => c.id === scheduleCourseId);
+      if (!selectedCourse) throw new Error("Invalid course selected");
+
+      const startTime = new Date(`${scheduleDate}T${scheduleStartTime}`).toISOString();
+      const endTime = new Date(`${scheduleDate}T${scheduleEndTime}`).toISOString();
+
+      await createSchedule({
+        course_id: selectedCourse.id,
+        lecturer_id: selectedCourse.lecturer_id,
+        title: scheduleTitle || selectedCourse.course_code,
+        start_time: startTime,
+        end_time: endTime,
+        location: scheduleLocation,
+      });
+
+      setScheduleMessage({ type: 'success', text: 'Class scheduled successfully!' });
+      setScheduleCourseId('');
+      setScheduleTitle('');
+      setScheduleDate('');
+      setScheduleStartTime('');
+      setScheduleEndTime('');
+      setScheduleLocation('');
+      loadSchedules();
+    } catch (error: any) {
+      setScheduleMessage({ type: 'error', text: error.message || 'Failed to schedule class.' });
+    } finally {
+      setScheduleLoading(false);
     }
   };
 
@@ -209,6 +265,96 @@ export default function AdminDashboard() {
           )}
         </div>
 
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mt-4">
+        {/* Schedule Class Form */}
+        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
+          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Schedule Class</h2>
+          
+          {scheduleMessage.text && (
+            <div className={`mb-6 p-4 rounded-xl flex items-start ${scheduleMessage.type === 'success' ? 'bg-green-100 text-green-800 border-2 border-green-200' : 'bg-red-100 text-red-800 border-2 border-red-200'}`}>
+              {scheduleMessage.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+              )}
+              <p className="font-medium text-sm">{scheduleMessage.text}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleCreateSchedule} className="space-y-4 flex-grow">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Select Course</label>
+              <select
+                required
+                value={scheduleCourseId}
+                onChange={(e) => setScheduleCourseId(e.target.value)}
+                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
+              >
+                <option value="" disabled>Select a Course...</option>
+                {courses.map(c => (
+                  <option key={c.id} value={c.id}>{c.course_code} - {c.course_title}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Date</label>
+              <input
+                type="date"
+                required
+                value={scheduleDate}
+                onChange={(e) => setScheduleDate(e.target.value)}
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Start Time</label>
+                <input
+                  type="time"
+                  required
+                  value={scheduleStartTime}
+                  onChange={(e) => setScheduleStartTime(e.target.value)}
+                  className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">End Time</label>
+                <input
+                  type="time"
+                  required
+                  value={scheduleEndTime}
+                  onChange={(e) => setScheduleEndTime(e.target.value)}
+                  className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Location (Optional)</label>
+              <input
+                type="text"
+                value={scheduleLocation}
+                onChange={(e) => setScheduleLocation(e.target.value)}
+                placeholder="e.g. Hall 2"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={scheduleLoading}
+              className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-6"
+            >
+              <CalendarIcon className="w-5 h-5 mr-2" />
+              {scheduleLoading ? 'Scheduling...' : 'Schedule Class'}
+            </button>
+          </form>
+        </div>
+
+        {/* Calendar View */}
+        <div className="xl:col-span-8">
+          <Calendar schedules={schedules} />
+        </div>
       </div>
 
       <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Course } from '../types';
-import { LogOut, Camera, CheckCircle, XCircle } from 'lucide-react';
+import { Course, ClassSchedule } from '../types';
+import { LogOut, Camera, CheckCircle, XCircle, Calendar as CalendarIcon } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { facultiesData } from '../data/faculties';
+import Calendar from '../components/Calendar';
+import { fetchSchedules } from '../lib/schedules';
 
 export default function StudentDashboard() {
   const { profile, signOut, refreshProfile } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState<{ status: 'success' | 'error', message: string } | null>(null);
+  const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -84,6 +87,12 @@ export default function StudentDashboard() {
         
       if (error) throw error;
       setEnrolledCourses(data || []);
+      
+      if (data && data.length > 0) {
+        const courseIds = data.map(e => e.course_id);
+        const scheduleData = await fetchSchedules({ course_ids: courseIds });
+        setSchedules(scheduleData);
+      }
     } catch (error) {
       console.error('Error fetching enrollments:', error);
     }
@@ -404,6 +413,11 @@ export default function StudentDashboard() {
           )}
         </div>
 
+      </div>
+
+      <div className="mt-4">
+        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">My Class Schedule</h2>
+        <Calendar schedules={schedules} />
       </div>
 
       <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">

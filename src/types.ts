@@ -44,3 +44,15 @@ export interface Enrollment {
   course_id: string;
   enrolled_at: string;
 }
+
+export interface ClassSchedule {
+  id: string;
+  course_id: string;
+  lecturer_id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  location?: string;
+  created_at: string;
+  course?: Partial<Course>;
+}
