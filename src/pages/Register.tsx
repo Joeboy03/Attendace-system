@@ -85,24 +85,24 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-6 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#18191B] text-slate-300 font-sans p-6 flex flex-col items-center justify-center">
       <div className="w-full max-w-md">
         
-        <div className="bg-white rounded-3xl border-2 border-slate-200 p-8 shadow-sm flex flex-col items-center">
-          <div className="w-16 h-16 bg-indigo-900 rounded-2xl flex items-center justify-center text-white mb-6 transform -rotate-3">
-            <UserPlus className="w-8 h-8 text-white rotate-3" />
+        <div className="bg-[#232427] rounded-3xl border border-slate-800 p-8 shadow-sm flex flex-col items-center">
+          <div className="w-16 h-16 bg-[#2D2E32] border border-slate-700 rounded-2xl flex items-center justify-center text-[#60D8B6] mb-6 transform -rotate-3">
+            <UserPlus className="w-8 h-8 rotate-3" />
           </div>
           
-          <h2 className="text-2xl font-bold tracking-tight text-indigo-900 mb-1">
+          <h2 className="text-2xl font-bold tracking-tight text-white mb-1">
             Create Account
           </h2>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-8">
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-8">
             Attendance Management System
           </p>
           
           <form className="w-full space-y-4" onSubmit={handleRegister}>
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                 Full Name
               </label>
               <input
@@ -110,13 +110,13 @@ export default function Register() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
                 placeholder="e.g. John Doe"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                 Email address
               </label>
               <input
@@ -124,14 +124,14 @@ export default function Register() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
                 placeholder="school@student.uniben.edu"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                     Role
                   </label>
                   <select
@@ -148,7 +148,7 @@ export default function Register() {
                     {role === 'student' ? (
                         <>
                             <div className="mb-4">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                     Matric Number
                                 </label>
                                 <input
@@ -156,12 +156,12 @@ export default function Register() {
                                     required
                                     value={matricNumber}
                                     onChange={(e) => setMatricNumber(e.target.value)}
-                                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
                                     placeholder="CSC170..."
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                     Level
                                 </label>
                                 <select
@@ -177,7 +177,7 @@ export default function Register() {
                                 </select>
                             </div>
                             <div className="mb-4">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                     Faculty
                                 </label>
                                 <select
@@ -192,7 +192,7 @@ export default function Register() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                     Department
                                 </label>
                                 <select
@@ -211,7 +211,7 @@ export default function Register() {
                         </>
                     ) : (
                         <>
-                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                 Staff ID
                             </label>
                             <input
@@ -219,7 +219,7 @@ export default function Register() {
                                 required
                                 value={staffId}
                                 onChange={(e) => setStaffId(e.target.value)}
-                                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
                                 placeholder="L-12345"
                             />
                         </>
@@ -228,7 +228,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 mt-2">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2">
                 Password
               </label>
               <input
@@ -236,13 +236,13 @@ export default function Register() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-700 focus:outline-none focus:border-[#60D8B6] focus:ring-1 focus:ring-[#60D8B6] rounded-xl bg-[#18191B] text-white placeholder-slate-500 transition-colors"
                 placeholder="Create a password"
               />
             </div>
 
             {error && (
-              <div className="text-red-600 bg-red-50 border border-red-200 p-3 rounded-xl text-sm font-medium mt-4">
+              <div className="text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-sm font-medium mt-4">
                 {error}
               </div>
             )}
@@ -257,7 +257,7 @@ export default function Register() {
           </form>
 
           <div className="mt-6 text-center">
-            <Link to="/login" className="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+            <Link to="/login" className="text-sm font-bold text-[#60D8B6] hover:text-[#4bc2a0] transition-colors">
                 Already have an account? Sign in
             </Link>
           </div>

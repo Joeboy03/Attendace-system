@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+const fs = require('fs');
+
+const loginCode = `import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap } from 'lucide-react';
@@ -103,3 +105,6 @@ export default function Login() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/Login.tsx', loginCode);
