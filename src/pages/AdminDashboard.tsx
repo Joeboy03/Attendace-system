@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { LogOut, Shield, Users, BookOpen, PlusCircle, GraduationCap, CheckCircle, XCircle, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import Calendar from '../components/Calendar';
 import AdminSearch from '../components/AdminSearch';
+import AdminDepartments from '../components/AdminDepartments';
 import { ClassSchedule } from '../types';
 import { fetchSchedules, createSchedule } from '../lib/schedules';
 
@@ -171,6 +172,10 @@ export default function AdminDashboard() {
         {/* Unified Search Section */}
         <div className="xl:col-span-12">
           <AdminSearch />
+        </div>
+        {/* Department Management Section */}
+        <div className="xl:col-span-12">
+          <AdminDepartments />
         </div>
         
         {/* Create Course Form */}

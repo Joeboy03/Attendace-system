@@ -56,3 +56,17 @@ export interface ClassSchedule {
   created_at: string;
   course?: Partial<Course>;
 }
+
+export interface Faculty {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  faculty_id: string;
+  created_at: string;
+  faculty?: Partial<Faculty>;
+}

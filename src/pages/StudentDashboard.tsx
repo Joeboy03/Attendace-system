@@ -4,11 +4,13 @@ import { supabase } from '../lib/supabase';
 import { Course, ClassSchedule } from '../types';
 import { LogOut, Camera, CheckCircle, XCircle, Calendar as CalendarIcon } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import { facultiesData } from '../data/faculties';
+import { fetchFaculties, fetchDepartments } from '../lib/departments';
+import { Faculty, Department } from '../types';
 import Calendar from '../components/Calendar';
 import { fetchSchedules } from '../lib/schedules';
 
 export default function StudentDashboard() {
+
   const { profile, signOut, refreshProfile } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [scanning, setScanning] = useState(false);
@@ -23,6 +25,25 @@ export default function StudentDashboard() {
     faculty: profile?.faculty || '',
     department: profile?.department || ''
   });
+  const [facultiesList, setFacultiesList] = useState<Faculty[]>([]);
+  const [departmentsList, setDepartmentsList] = useState<Department[]>([]);
+
+  useEffect(() => {
+    fetchFaculties().then(setFacultiesList);
+  }, []);
+
+  useEffect(() => {
+    if (profileForm.faculty) {
+      const f = facultiesList.find(fac => fac.name === profileForm.faculty);
+      if (f) {
+        fetchDepartments(f.id).then(setDepartmentsList);
+      } else {
+        setDepartmentsList([]);
+      }
+    } else {
+      setDepartmentsList([]);
+    }
+  }, [profileForm.faculty, facultiesList]);
   const [profileUpdateMsg, setProfileUpdateMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   useEffect(() => {
@@ -60,12 +81,11 @@ export default function StudentDashboard() {
         
       if (error) throw error;
       
-      setProfileUpdateMsg({ type: 'success', text: 'Profile updated successfully!' });
       await refreshProfile();
       setTimeout(() => setIsEditingProfile(false), 1500);
     } catch (error: any) {
-      console.error('Error updating profile:', error);
       setProfileUpdateMsg({ type: 'error', text: error.message || 'Failed to update profile' });
+      console.error('Error updating profile:', error);
     }
   };
 
@@ -113,7 +133,6 @@ export default function StudentDashboard() {
     try {
       if (!profile?.matric_number) {
         setScanning(false);
-        setScanResult({ status: 'error', message: 'Please complete your profile (Matric Number required) before marking attendance.' });
         setIsEditingProfile(true);
         return;
       }
@@ -148,7 +167,6 @@ export default function StudentDashboard() {
         .maybeSingle();
         
       if (existingRecord) {
-        setScanResult({ status: 'success', message: 'You have already marked your attendance for this class.' });
         return;
       }
       
@@ -159,15 +177,12 @@ export default function StudentDashboard() {
           session_id: session.id,
           student_id: profile?.id
         });
-        
-      if (insertError) throw insertError;
+        if (insertError) throw insertError;
       
-      setScanResult({ status: 'success', message: 'Attendance marked successfully!' });
       
     } catch (error: any) {
       console.error("Scan error:", error);
       setScanning(false);
-      setScanResult({ status: 'error', message: error.message || 'Failed to verify QR Code' });
     }
   };
 
@@ -238,7 +253,6 @@ export default function StudentDashboard() {
               <button
                 onClick={() => { 
                   if (!profile?.matric_number) {
-                    setScanResult({ status: 'error', message: 'Please complete your profile (Matric Number required) before scanning.' });
                     setIsEditingProfile(true);
                   } else {
                     setScanning(true); 
@@ -345,8 +359,8 @@ export default function StudentDashboard() {
                     required
                   >
                     <option value="" disabled>Select Faculty</option>
-                    {Object.keys(facultiesData).map(faculty => (
-                      <option key={faculty} value={faculty}>{faculty}</option>
+                    {facultiesList.map(faculty => (
+                      <option key={faculty.id} value={faculty.name}>{faculty.name}</option>
                     ))}
                   </select>
                 </div>
@@ -360,8 +374,8 @@ export default function StudentDashboard() {
                     disabled={!profileForm.faculty}
                   >
                     <option value="" disabled>Select Department</option>
-                    {profileForm.faculty && facultiesData[profileForm.faculty as keyof typeof facultiesData]?.map((dept: string) => (
-                      <option key={dept} value={dept}>{dept}</option>
+                    {departmentsList.map(dept => (
+                      <option key={dept.id} value={dept.name}>{dept.name}</option>
                     ))}
                   </select>
                 </div>

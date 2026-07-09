@@ -3,7 +3,9 @@ import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, UserPlus } from 'lucide-react';
 import { UserRole } from '../types';
-import { facultiesData } from '../data/faculties';
+import { fetchFaculties, fetchDepartments } from '../lib/departments';
+import { Faculty, Department } from '../types';
+import { useEffect } from 'react';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
@@ -15,6 +17,28 @@ export default function Register() {
   const [level, setLevel] = useState('100 Level');
   const [faculty, setFaculty] = useState('');
   const [department, setDepartment] = useState('');
+  const [facultiesList, setFacultiesList] = useState<Faculty[]>([]);
+  const [departmentsList, setDepartmentsList] = useState<Department[]>([]);
+
+  useEffect(() => {
+    fetchFaculties().then(setFacultiesList);
+  }, []);
+
+  useEffect(() => {
+    if (faculty) {
+      // Here faculty is the ID or Name. In our schema, it should probably be the name since we save string in DB, but the ID is better for fetching.
+      // For simplicity, assuming `faculty` state holds the faculty name. But fetchDepartments takes ID.
+      // Let's modify fetchDepartments to be called with ID if needed. Wait, faculty state is currently Name.
+      const f = facultiesList.find(fac => fac.name === faculty);
+      if (f) {
+        fetchDepartments(f.id).then(setDepartmentsList);
+      } else {
+        setDepartmentsList([]);
+      }
+    } else {
+      setDepartmentsList([]);
+    }
+  }, [faculty, facultiesList]);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -162,8 +186,8 @@ export default function Register() {
                                     className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 text-slate-900 transition-colors appearance-none"
                                 >
                                     <option value="" disabled>Select Faculty</option>
-                                    {Object.keys(facultiesData).map(fac => (
-                                      <option key={fac} value={fac}>{fac}</option>
+                                    {facultiesList.map(fac => (
+                                      <option key={fac.id} value={fac.name}>{fac.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -179,8 +203,8 @@ export default function Register() {
                                     disabled={!faculty}
                                 >
                                     <option value="" disabled>Select Department</option>
-                                    {faculty && facultiesData[faculty as keyof typeof facultiesData]?.map((dept: string) => (
-                                      <option key={dept} value={dept}>{dept}</option>
+                                    {departmentsList.map(dept => (
+                                      <option key={dept.id} value={dept.name}>{dept.name}</option>
                                     ))}
                                 </select>
                             </div>
