@@ -1,30 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Course, AttendanceSession, ClassSchedule } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
-import { 
-  LogOut, QrCode, 
-  Search, 
-  Bell, 
-  ChevronDown, 
-  Plus, 
-  LayoutGrid, 
-  TrendingUp, 
-  Briefcase, 
-  FileText, 
-  Wallet, 
-  Clock, 
-  Percent, 
-  Settings, 
-  ArrowUpRight, 
-  ArrowDownRight,
-  Wifi,
-  MoreHorizontal
-} from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download, Calendar as CalendarIcon } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import Calendar from '../components/Calendar';
+import { fetchSchedules } from '../lib/schedules';
 
 export default function LecturerDashboard() {
   const { profile, signOut } = useAuth();
@@ -34,10 +17,20 @@ export default function LecturerDashboard() {
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [sessionStats, setSessionStats] = useState<any[]>([]);
   const [recentAttendees, setRecentAttendees] = useState<any[]>([]);
+  const [demographicStats, setDemographicStats] = useState<{faculty: string, count: number}[]>([]);
+  const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
 
   useEffect(() => {
     fetchCourses();
+    if (profile?.id) {
+      loadSchedules(profile.id);
+    }
   }, [profile]);
+
+  const loadSchedules = async (lecturerId: string) => {
+    const data = await fetchSchedules({ lecturer_id: lecturerId });
+    setSchedules(data);
+  };
 
   const fetchCourses = async () => {
     if (!profile) return;
@@ -75,7 +68,33 @@ export default function LecturerDashboard() {
         setRecentAttendees([]);
         return;
       }
+
       const sessionId = sessions[0].id;
+
+      // Fetch all attendees for demographics
+      const { data: allAttendees } = await supabase
+        .from('attendance_records')
+        .select(`
+          users (
+            faculty,
+            department
+          )
+        `)
+        .eq('session_id', sessionId);
+        
+      if (allAttendees) {
+        const facultyCounts = allAttendees.reduce((acc: any, curr: any) => {
+          const faculty = curr.users?.faculty || 'Unknown';
+          acc[faculty] = (acc[faculty] || 0) + 1;
+          return acc;
+        }, {});
+        
+        setDemographicStats(Object.keys(facultyCounts).map(key => ({
+          faculty: key,
+          count: facultyCounts[key]
+        })));
+      }
+
       const { data, error } = await supabase
         .from('attendance_records')
         .select(`
@@ -84,39 +103,19 @@ export default function LecturerDashboard() {
           users (
             full_name,
             matric_number,
+            level,
+            faculty,
             department
           )
         `)
         .eq('session_id', sessionId)
         .order('scanned_at', { ascending: false })
-        .limit(4);
+        .limit(10);
 
       if (error) throw error;
       setRecentAttendees(data || []);
     } catch (error) {
       console.error('Error fetching recent attendees:', error);
-    }
-  };
-
-  const fetchSessionStats = async (courseId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('attendance_sessions')
-        .select('id, created_at, attendance_records(count)')
-        .eq('course_id', courseId)
-        .order('created_at', { ascending: true })
-        .limit(12);
-
-      if (error) throw error;
-      
-      const formattedStats = data.map((session: any) => ({
-        name: format(new Date(session.created_at), 'MMM dd'),
-        attendance: session.attendance_records[0]?.count || 0
-      }));
-      
-      setSessionStats(formattedStats);
-    } catch (error) {
-      console.error('Error fetching session stats:', error);
     }
   };
 
@@ -127,37 +126,74 @@ export default function LecturerDashboard() {
         .select('*')
         .eq('course_id', courseId)
         .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(1)
         .single();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is not found
       setActiveSession(data || null);
     } catch (error) {
       console.error('Error fetching active session:', error);
     }
   };
 
+  const fetchSessionStats = async (courseId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('attendance_sessions')
+        .select(`
+          id, 
+          created_at, 
+          attendance_records(count)
+        `)
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: true });
+        
+      if (error) throw error;
+      
+      const formattedStats = data?.map((session, index) => {
+        // Handle postgrest count return which is an array of objects for related tables
+        let count = 0;
+        if (session.attendance_records && session.attendance_records.length > 0) {
+           count = (session.attendance_records[0] as any).count || session.attendance_records.length;
+        }
+        
+        return {
+          name: `S${index + 1}`,
+          date: format(new Date(session.created_at), 'MMM d'),
+          attendance: count
+        };
+      }) || [];
+      
+      setSessionStats(formattedStats);
+    } catch (error) {
+      console.error('Error fetching session stats:', error);
+    }
+  };
+
   const handleStartSession = async () => {
     if (!selectedCourse || !profile) return;
+    
+    // Generate a secure random token for the QR code
+    const sessionToken = crypto.randomUUID();
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiration
+    
     try {
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 2);
-      
       const { data, error } = await supabase
         .from('attendance_sessions')
         .insert({
           course_id: selectedCourse,
           lecturer_id: profile.id,
-          session_token: crypto.randomUUID(),
-          expires_at: expiresAt.toISOString()
+          session_token: sessionToken,
+          is_active: true,
+          expires_at: expiresAt.toISOString(),
         })
         .select()
         .single();
         
       if (error) throw error;
       setActiveSession(data);
-      fetchSessionStats(selectedCourse);
+      fetchSessionStats(selectedCourse); // Refresh stats
+      fetchRecentAttendees(selectedCourse);
     } catch (error) {
       console.error('Error starting session:', error);
     }
@@ -173,141 +209,154 @@ export default function LecturerDashboard() {
         
       if (error) throw error;
       setActiveSession(null);
-      fetchSessionStats(selectedCourse);
+      fetchSessionStats(selectedCourse); // Refresh stats
       fetchRecentAttendees(selectedCourse);
     } catch (error) {
       console.error('Error ending session:', error);
     }
   };
 
-  const getFirstName = () => {
-    if (!profile?.full_name) return 'User';
-    return profile.full_name.split(' ')[0];
+  const handleExport = async (formatType: 'csv' | 'pdf') => {
+    if (!selectedCourse) return;
+    try {
+      const { data: sessions, error: sessionError } = await supabase
+        .from('attendance_sessions')
+        .select('id, created_at')
+        .eq('course_id', selectedCourse)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (sessionError || !sessions || sessions.length === 0) {
+        alert("No sessions found to export.");
+        return;
+      }
+
+      const sessionId = sessions[0].id;
+      const sessionDate = format(new Date(sessions[0].created_at), 'yyyy-MM-dd');
+
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select(`
+          id,
+          scanned_at,
+          users (
+            full_name,
+            matric_number,
+            level,
+            faculty,
+            department
+          )
+        `)
+        .eq('session_id', sessionId)
+        .order('scanned_at', { ascending: false });
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        alert("No attendance records found for the latest session.");
+        return;
+      }
+      
+      const course = courses.find(c => c.id === selectedCourse);
+      const courseCode = course ? course.course_code : 'Course';
+
+      if (formatType === 'csv') {
+        const headers = ['Name', 'Matric Number', 'Level', 'Faculty', 'Department', 'Time Scanned', 'Status'];
+        const csvContent = [
+          headers.join(','),
+          ...data.map((record: any) => [
+            `"${record.users?.full_name || 'N/A'}"`,
+            `"${record.users?.matric_number || 'N/A'}"`,
+            `"${record.users?.level || 'N/A'}"`,
+            `"${record.users?.faculty || 'N/A'}"`,
+            `"${record.users?.department || 'N/A'}"`,
+            `"${format(new Date(record.scanned_at), 'h:mm:ss a')}"`,
+            '"PRESENT"'
+          ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `${courseCode}_Attendance_${sessionDate}.csv`);
+        a.click();
+      } else {
+        const { jsPDF } = await import('jspdf');
+        const autoTable = (await import('jspdf-autotable')).default;
+        
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text(`Attendance Report: ${courseCode}`, 14, 22);
+        doc.setFontSize(11);
+        doc.text(`Date: ${sessionDate}`, 14, 30);
+        
+        const tableColumn = ["Name", "Matric No.", "Level", "Dept", "Time", "Status"];
+        const tableRows = data.map((record: any) => [
+          record.users?.full_name || 'N/A',
+          record.users?.matric_number || 'N/A',
+          record.users?.level || 'N/A',
+          record.users?.department || 'N/A',
+          format(new Date(record.scanned_at), 'h:mm:ss a'),
+          'PRESENT'
+        ]);
+        
+        autoTable(doc, {
+          head: [tableColumn],
+          body: tableRows,
+          startY: 40,
+        });
+        
+        doc.save(`${courseCode}_Attendance_${sessionDate}.pdf`);
+      }
+    } catch (error) {
+      console.error('Error exporting records:', error);
+      alert('Failed to export records.');
+    }
   };
 
-  const activeCourseData = courses.find(c => c.id === selectedCourse);
-  
-  // Dummy data for charts to match design if real data is sparse
-  const barData = [
-    { name: 'JAN', value: 20 },
-    { name: 'FEB', value: 45 },
-    { name: 'MAR', value: 30 },
-    { name: 'APR', value: 65, active: true },
-    { name: 'MAY', value: 40 },
-    { name: 'JUN', value: 50 },
-  ];
-
-  const lineData = [
-    { name: '1', value: 20 },
-    { name: '2', value: 30 },
-    { name: '3', value: 25 },
-    { name: '4', value: 40 },
-    { name: '5', value: 35 },
-    { name: '6', value: 50 },
-    { name: '7', value: 45 },
-    { name: '8', value: 60 },
-  ];
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-bold">Loading dashboard...</div>;
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] text-slate-800 font-sans p-4 md:p-8 flex">
-      {/* Container */}
-      <div className="w-full max-w-[1400px] mx-auto bg-[#F6F8FA] rounded-[32px] md:rounded-[40px] shadow-sm flex overflow-hidden border-4 border-white">
-        
-        {/* Floating Sidebar */}
-        <div className="w-20 bg-[#F6F8FA] flex flex-col items-center py-8 justify-between relative z-10 border-r border-slate-200/50">
-          <div className="space-y-6 flex flex-col items-center">
-            {/* Logo Icon */}
-            <div className="w-10 h-10 bg-gradient-to-br from-[#1C7A58] to-[#12583F] rounded-xl flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg shadow-[#1C7A58]/20">
-              U
-            </div>
-            
-            {/* Nav Icons */}
-            <div className="w-12 h-12 bg-[#1C7A58] rounded-full flex items-center justify-center text-white shadow-md shadow-[#1C7A58]/30">
-              <LayoutGrid size={20} strokeWidth={2.5} />
-            </div>
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <TrendingUp size={20} strokeWidth={2.5} />
-            </div>
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <Briefcase size={20} strokeWidth={2.5} />
-            </div>
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <FileText size={20} strokeWidth={2.5} />
-            </div>
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <Wallet size={20} strokeWidth={2.5} />
-            </div>
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <Clock size={20} strokeWidth={2.5} />
-            </div>
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <Percent size={20} strokeWidth={2.5} />
-            </div>
-          </div>
-          
-          <div className="space-y-4 flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 transition-colors cursor-pointer">
-              <Settings size={20} strokeWidth={2.5} />
-            </div>
-            <div 
-              onClick={signOut}
-              className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200/50 hover:text-red-500 transition-colors cursor-pointer"
-            >
-              <LogOut size={20} strokeWidth={2.5} />
-            </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-6 flex flex-col">
+      <header className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-indigo-900 rounded-full flex items-center justify-center text-white font-bold text-xl">U</div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-indigo-900">University of Benin</h1>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Attendance Management System</p>
           </div>
         </div>
+        <div className="flex items-center gap-6">
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-semibold text-slate-800">{profile?.full_name}</p>
+            <p className="text-xs text-indigo-600 font-medium">Lecturer</p>
+          </div>
+          <button 
+            onClick={signOut}
+            className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700 hover:bg-indigo-200 transition-colors"
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col h-full bg-[#F6F8FA] overflow-y-auto">
-          
-          {/* Header */}
-          <header className="flex justify-between items-center px-8 py-6">
-            <div className="flex items-center gap-2">
-              <div className="text-xl font-bold text-slate-800 tracking-tight flex items-center">
-                <span className="text-[#1C7A58] mr-1">Quix</span>otic
-              </div>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-1 bg-white rounded-full px-2 py-1.5 shadow-sm border border-slate-100">
-              <button className="px-6 py-2 bg-slate-50 text-slate-800 rounded-full text-sm font-semibold shadow-sm border border-slate-200/50">Dashboard</button>
-              <button className="px-6 py-2 text-slate-500 hover:text-slate-700 rounded-full text-sm font-medium transition-colors">Reports</button>
-              <button className="px-6 py-2 text-slate-500 hover:text-slate-700 rounded-full text-sm font-medium transition-colors">Documents</button>
-              <button className="px-6 py-2 text-slate-500 hover:text-slate-700 rounded-full text-sm font-medium transition-colors">History</button>
-              <button className="px-6 py-2 text-slate-500 hover:text-slate-700 rounded-full text-sm font-medium transition-colors">Contacts</button>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 hover:bg-slate-50">
-                <Search size={18} />
-              </button>
-              <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 hover:bg-slate-50 relative">
-                <Bell size={18} />
-                <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-              </button>
-              <div className="flex items-center gap-2 bg-white rounded-full p-1.5 pr-3 shadow-sm border border-slate-100 cursor-pointer">
-                <div className="w-8 h-8 bg-slate-200 rounded-full overflow-hidden">
-                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.full_name || 'user'}`} alt="Avatar" className="w-full h-full object-cover" />
-                </div>
-                <ChevronDown size={14} className="text-slate-500" />
-              </div>
-            </div>
-          </header>
-
-          {/* Welcome & Date Row */}
-          <div className="px-8 flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
-            <h1 className="text-[32px] text-slate-800 tracking-tight">
-              Welcome Back, <span className="font-bold">{getFirstName()}</span>
-            </h1>
-            
-            <div className="flex items-center gap-4 mt-4 md:mt-0">
-              <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-slate-200/70 shadow-sm text-sm font-medium text-slate-600">
-                <CalendarIcon size={16} className="text-slate-400" />
-                <span>29 Jun, 2025 - 29 August, 2025</span>
-                <ChevronDown size={14} className="text-slate-400 ml-1" />
-              </div>
-              
-              <select 
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 flex-grow">
+        
+        {/* Manage Class / Active Session Control */}
+        <div className="xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
+            <Users className="w-5 h-5 mr-2 text-indigo-500" />
+            Manage Class
+          </h2>
+          <div className="space-y-4 flex-grow flex flex-col justify-center">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider text-xs">
+                Select Course
+              </label>
+              <select
+                className="w-full pl-4 pr-10 py-3 text-base border-2 border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl bg-slate-50 font-medium text-slate-800"
                 value={selectedCourse}
                 onChange={(e) => {
                   setSelectedCourse(e.target.value);
@@ -315,321 +364,246 @@ export default function LecturerDashboard() {
                   fetchSessionStats(e.target.value);
                   fetchRecentAttendees(e.target.value);
                 }}
-                className="bg-white px-4 py-2.5 rounded-xl border border-slate-200/70 shadow-sm text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#1C7A58]"
+                disabled={activeSession !== null}
               >
-                {courses.length > 0 ? (
-                   courses.map(c => <option key={c.id} value={c.id}>{c.course_code}</option>)
-                ) : (
-                   <option disabled>No Courses</option>
-                )}
+                {courses.map(course => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_code} - {course.course_title}
+                  </option>
+                ))}
               </select>
-
-              {!activeSession ? (
-                <button 
-                  onClick={handleStartSession}
-                  disabled={!selectedCourse}
-                  className="bg-white hover:bg-slate-50 border border-slate-200/70 shadow-sm text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center transition-colors"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Add New Session
-                </button>
-              ) : (
-                <button 
+            </div>
+            
+            {!activeSession ? (
+              <button
+                onClick={handleStartSession}
+                disabled={!selectedCourse}
+                className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-900 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-4"
+              >
+                <PlusCircle className="w-5 h-5 mr-2" />
+                Start Session
+              </button>
+            ) : (
+              <div className="flex gap-3 mt-4">
+                <button
                   onClick={handleEndSession}
-                  className="bg-red-50 hover:bg-red-100 border border-red-200 shadow-sm text-red-600 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center transition-colors"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-4 rounded-xl text-sm font-bold flex-1 transition-colors flex items-center justify-center"
                 >
-                  End Session
+                  End Active Session
                 </button>
-              )}
-            </div>
-          </div>
-
-          {/* Main Grid */}
-          <div className="px-8 pb-8 flex-1">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-              
-              {/* Left Column (Card style + Weekly Revenue) */}
-              <div className="lg:col-span-3 space-y-6 flex flex-col">
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h3 className="text-slate-800 font-bold text-base">Active Course</h3>
-                      <p className="text-slate-400 text-xs mt-0.5">Course overview details</p>
-                    </div>
-                    <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors">
-                      <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                  
-                  {/* The Green Card */}
-                  <div className="bg-gradient-to-br from-[#1C7A58] to-[#12583F] rounded-2xl p-5 text-white shadow-lg shadow-[#1C7A58]/20 relative overflow-hidden">
-                    {/* Decorative pattern could go here */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                    
-                    <div className="flex justify-between items-center mb-6 relative z-10">
-                      <span className="font-bold text-lg tracking-wider">UNIBEN</span>
-                      <Wifi size={18} className="rotate-90 opacity-80" />
-                    </div>
-                    
-                    <div className="mb-8 relative z-10">
-                      <p className="text-white/70 text-xs mb-1">Course Code</p>
-                      <h2 className="text-[28px] font-bold leading-none">{activeCourseData?.course_code || '---'}</h2>
-                    </div>
-                    
-                    <div className="flex justify-between items-end relative z-10 text-xs font-medium text-white/80">
-                      <span className="tracking-widest">**** {activeCourseData?.id?.substring(0, 4) || '0000'}</span>
-                      <span>EXP 09/26</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-slate-500 text-xs font-medium">Weekly Attendance</p>
-                    <div className="bg-[#E2F1EB] text-[#1C7A58] text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center">
-                      +12.8%
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-800">+3,945 <span className="text-base text-slate-400 font-medium">Students</span></h3>
-                </div>
               </div>
-
-              {/* Middle Column (Bar Chart) */}
-              <div className="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col">
-                <div className="flex justify-between items-center mb-8">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500">
-                      <LayoutGrid size={14} />
-                    </div>
-                    <h3 className="text-slate-800 font-bold text-base">Engagement Rate</h3>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="bg-slate-50 p-1 rounded-full flex text-xs font-semibold border border-slate-100">
-                      <button className="px-4 py-1.5 rounded-full text-slate-500 hover:text-slate-700">Monthly</button>
-                      <button className="px-4 py-1.5 rounded-full bg-[#1C7A58] text-white shadow-sm">Annually</button>
-                    </div>
-                    <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors">
-                      <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex-1 w-full relative">
-                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={barData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis 
-                        dataKey="name" 
-                        axisLine={false} 
-                        tickLine={false} 
-                        tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 600 }}
-                        dy={10}
-                      />
-                      <YAxis 
-                        axisLine={false} 
-                        tickLine={false} 
-                        tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 600 }}
-                        tickFormatter={(val) => `${val}k`}
-                      />
-                      <Tooltip 
-                        cursor={{fill: 'transparent'}}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                      />
-                      <Bar dataKey="value" radius={[20, 20, 20, 20]} barSize={40}>
-                        {barData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.active ? '#1C7A58' : '#88BEA8'} style={{ opacity: entry.active ? 1 : 0.8 }} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                  {/* Custom tooltip marker simulation */}
-                  <div className="absolute top-[8%] left-[55%] -translate-x-1/2 bg-[#1C7A58] text-white text-[10px] font-bold px-2 py-1 rounded-full z-10 flex items-center">
-                    +17.8%
-                  </div>
-                  <div className="absolute top-[16%] left-[55%] -translate-x-1/2 w-3 h-3 bg-white border-[3px] border-[#1C7A58] rounded-full z-10 shadow-sm"></div>
-                </div>
-              </div>
-
-              {/* Right Column (Line Chart & Amount Credit) */}
-              <div className="lg:col-span-4 space-y-6 flex flex-col">
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden h-[240px] flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="text-slate-800 font-bold text-base">Attendance Goal</h3>
-                      <p className="text-slate-400 text-xs mt-0.5">Total class attendance goal</p>
-                    </div>
-                    <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors z-10">
-                      <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                  
-                  <div className="text-center mt-2 mb-4 z-10">
-                    <p className="text-slate-500 text-xs font-medium">Average Attendance</p>
-                    <h3 className="text-[28px] font-bold text-slate-800">86.5%</h3>
-                  </div>
-
-                  <div className="absolute bottom-0 left-0 right-0 h-[100px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={lineData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#1C7A58" stopOpacity={0.2}/>
-                            <stop offset="95%" stopColor="#1C7A58" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <Area 
-                          type="monotone" 
-                          dataKey="value" 
-                          stroke="#1C7A58" 
-                          strokeWidth={2}
-                          fill="url(#colorValue)" 
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                  
-                  <div className="absolute bottom-6 left-6 right-6 flex gap-3 z-10">
-                    <button className="flex-1 bg-[#1C7A58] text-white py-2.5 rounded-xl text-xs font-bold flex justify-center items-center gap-1 shadow-sm shadow-[#1C7A58]/20">
-                      Export CSV
-                    </button>
-                    <button className="flex-1 bg-white border border-slate-200 text-slate-600 py-2.5 rounded-xl text-xs font-bold flex justify-center items-center gap-1 shadow-sm hover:bg-slate-50">
-                      Export PDF
-                    </button>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex-1 flex flex-col justify-between">
-                  {activeSession ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                      <div className="flex justify-between items-center w-full mb-4">
-                        <span className="px-3 py-1 bg-green-100 text-[#1C7A58] text-[10px] font-bold rounded-full flex items-center">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#1C7A58] animate-pulse mr-1.5"></span>
-                          LIVE SESSION
-                        </span>
-                        <span className="text-slate-400 text-[10px] font-mono font-bold bg-slate-100 px-2 py-1 rounded-full">
-                          Ends: {format(new Date(activeSession.expires_at), 'h:mm a')}
-                        </span>
-                      </div>
-                      <div className="bg-white p-2 border border-slate-200 rounded-2xl shadow-sm mb-3">
-                        <QRCodeSVG 
-                           value={JSON.stringify({
-                             sessionId: activeSession.id,
-                             token: activeSession.session_token
-                           })} 
-                           size={120}
-                          level="H"
-                        />
-                      </div>
-                      <p className="text-slate-800 font-mono text-sm font-bold tracking-widest">{activeSession.session_token.split('-')[0].toUpperCase()}</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div>
-                        <div className="flex justify-between items-start mb-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500">
-                              <QrCode size={16} />
-                            </div>
-                            <div>
-                              <h3 className="text-slate-800 font-bold text-base">Session QR</h3>
-                              <p className="text-slate-400 text-xs mt-0.5">Start session to view QR</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex flex-col items-center justify-center py-4 opacity-50">
-                          <div className="w-24 h-24 border-4 border-dashed border-slate-200 rounded-2xl flex items-center justify-center mb-3">
-                            <Plus size={24} className="text-slate-400" />
-                          </div>
-                          <p className="text-sm font-bold text-slate-400">No Active Session</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              
-              {/* Bottom Table */}
-              <div className="lg:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="text-slate-800 font-bold text-base">Session History</h3>
-                    <p className="text-slate-400 text-xs mt-0.5">Recent attendance history</p>
-                  </div>
-                  <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors">
-                    <ArrowUpRight size={14} />
-                  </button>
-                </div>
-
-                <div className="w-full overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="text-xs font-bold text-slate-400 border-b border-slate-100">
-                        <th className="pb-3 font-medium">Name</th>
-                        <th className="pb-3 font-medium">Date</th>
-                        <th className="pb-3 font-medium">Time</th>
-                        <th className="pb-3 font-medium">Status</th>
-                        <th className="pb-3 font-medium text-right">Department</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentAttendees.length > 0 ? (
-                        recentAttendees.map((record, idx) => (
-                          <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
-                            <td className="py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-[#FFE7D9] flex items-center justify-center text-[#FF5630] font-bold text-xs">
-                                  {record.users?.full_name?.substring(0, 2).toUpperCase() || 'UN'}
-                                </div>
-                                <div>
-                                  <p className="text-sm font-bold text-slate-800">{record.users?.full_name}</p>
-                                  <p className="text-xs text-slate-400">{record.users?.matric_number}</p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-4 text-sm font-semibold text-slate-700">
-                              {format(new Date(record.scanned_at), 'dd MMM yyyy')}
-                            </td>
-                            <td className="py-4 text-sm font-semibold text-slate-700">
-                              {format(new Date(record.scanned_at), 'hh:mm a')}
-                            </td>
-                            <td className="py-4">
-                              <span className="flex items-center text-xs font-bold text-[#1C7A58]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#1C7A58] mr-2"></span>
-                                Present
-                              </span>
-                            </td>
-                            <td className="py-4 text-sm font-semibold text-slate-700 text-right">
-                              {record.users?.department || 'N/A'}
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-400 text-sm">
-                            No recent attendees
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-            </div>
+            )}
           </div>
         </div>
+
+        {/* QR Code Display */}
+        <div className="xl:col-span-1 bg-indigo-900 rounded-3xl p-6 flex flex-col items-center justify-center shadow-lg min-h-[300px]">
+          {activeSession ? (
+            <>
+              <div className="flex justify-between items-center w-full mb-6">
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full flex items-center">
+                  <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse mr-2"></span>
+                  LIVE
+                </span>
+                <span className="text-indigo-200 text-xs font-mono font-bold bg-black/20 px-3 py-1 rounded-full">Expires: {format(new Date(activeSession.expires_at), 'h:mm a')}</span>
+              </div>
+              <div className="bg-white p-4 rounded-2xl mb-4 shadow-xl">
+                <div className="border-4 border-slate-900 flex items-center justify-center rounded-xl overflow-hidden p-2">
+                  <QRCodeSVG 
+                    value={JSON.stringify({ 
+                      sessionId: activeSession.id, 
+                      token: activeSession.session_token 
+                    })} 
+                    size={180}
+                    level="H"
+                  />
+                </div>
+              </div>
+              <p className="text-white font-mono text-sm font-bold truncate max-w-full px-4">{activeSession.session_token.split('-')[0].toUpperCase()}</p>
+            </>
+          ) : (
+            <div className="text-indigo-300 flex flex-col items-center opacity-70">
+              <QrCode className="w-16 h-16 mb-4" />
+              <p className="text-lg font-bold text-white">No Active Session</p>
+            </div>
+          )}
+        </div>
+
+        {/* Attendance Trends */}
+        <div className="xl:col-span-2 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center">
+              <TrendingUp className="w-4 h-4 mr-2 text-indigo-500" />
+              Attendance Trends
+            </h2>
+            {selectedCourse && (
+              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                {courses.find(c => c.id === selectedCourse)?.course_code}
+              </span>
+            )}
+          </div>
+          
+          <div className="flex-grow w-full min-h-[200px]">
+            {sessionStats.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={sessionStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4338ca" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#4338ca" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    allowDecimals={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    itemStyle={{ color: '#312e81', fontWeight: 'bold' }}
+                    labelStyle={{ color: '#64748b', marginBottom: '4px', fontSize: '12px' }}
+                    cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="attendance" 
+                    name="Students Present"
+                    stroke="#4338ca" 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill="url(#colorAttendance)" 
+                    activeDot={{ r: 6, fill: '#4338ca', stroke: '#fff', strokeWidth: 2 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-slate-400 font-medium text-sm border-2 border-dashed border-slate-200 rounded-2xl">
+                No attendance data available for this course yet.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Faculty Demographics */}
+        <div className="xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col min-h-[250px]">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center">
+              <Users className="w-4 h-4 mr-2 text-indigo-500" />
+              Faculty Breakdown
+            </h2>
+          </div>
+          <div className="flex-grow flex flex-col justify-center space-y-4">
+            {demographicStats.length > 0 ? (
+              demographicStats.sort((a, b) => b.count - a.count).map((stat, i) => (
+                <div key={i}>
+                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                    <span className="truncate max-w-[150px]">{stat.faculty}</span>
+                    <span>{stat.count}</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-indigo-500 h-full rounded-full" 
+                      style={{ width: `${(stat.count / Math.max(...demographicStats.map(s => s.count))) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-slate-400 font-medium text-sm">
+                No demographics.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Real-time Log */}
+        <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden flex flex-col shadow-sm min-h-[250px]">
+          <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <div className="flex items-center">
+              <h3 className="font-bold text-slate-800 text-sm uppercase tracking-widest flex items-center">
+                <Users className="w-4 h-4 mr-2 text-indigo-500" />
+                Class Participation Log
+              </h3>
+              {activeSession && <span className="animate-pulse w-2.5 h-2.5 bg-green-500 rounded-full ml-3"></span>}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => handleExport('csv')} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+                <Download className="w-3 h-3 mr-1" /> CSV
+              </button>
+              <button onClick={() => handleExport('pdf')} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+                <Download className="w-3 h-3 mr-1" /> PDF
+              </button>
+            </div>
+          </div>
+          <div className="flex-grow overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[600px]">
+              <thead>
+                <tr className="border-b border-slate-100">
+                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Student Name</th>
+                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Matric Number</th>
+                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Level & Dept</th>
+                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Time Scanned</th>
+                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentAttendees.length > 0 ? (
+                  recentAttendees.map((record, i) => (
+                    <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                      <td className="p-4 text-sm font-bold text-slate-800 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
+                          {record.users?.full_name?.charAt(0) || '?'}
+                        </div>
+                        {record.users?.full_name || 'Unknown'}
+                      </td>
+                      <td className="p-4 text-xs font-medium text-slate-600">{record.users?.matric_number || 'N/A'}</td>
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-slate-700">{record.users?.department || 'N/A'}</span>
+                          <span className="text-[10px] font-medium text-slate-500">{record.users?.level || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-xs font-medium text-slate-500">{format(new Date(record.scanned_at), 'h:mm:ss a')}</td>
+                      <td className="p-4 text-right">
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md">PRESENT</span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-400 font-medium text-sm">
+                      No recent attendance records found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
+
+      <div className="mt-4">
+        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">My Class Schedule</h2>
+        <Calendar schedules={schedules} />
+      </div>
+
+      <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+        <p>© 2024 University of Benin • CSC Final Year Project</p>
+        <div className="flex gap-4">
+          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> System Online</span>
+        </div>
+      </footer>
     </div>
   );
 }
 
-const CalendarIcon = ({ size = 24, className = "" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-    <line x1="16" y1="2" x2="16" y2="6"></line>
-    <line x1="8" y1="2" x2="8" y2="6"></line>
-    <line x1="3" y1="10" x2="21" y2="10"></line>
-  </svg>
-);
