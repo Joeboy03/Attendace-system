@@ -232,7 +232,7 @@ export default function StudentDashboard() {
     <div className="min-h-screen bg-slate-50 text-slate-600 font-sans p-6 flex flex-col gap-6">
       
       {/* Top Section - Student Profile */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-200">
+      <div className="bg-white/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-purple-900/5">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
@@ -367,7 +367,7 @@ export default function StudentDashboard() {
 
       {/* QR Scanner Modal / Section */}
       {scanning && (
-        <div className="bg-white rounded-3xl p-8 border border-slate-200">
+        <div className="bg-white/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-purple-900/5">
           <div className="flex justify-between items-center mb-6">
              <div className="flex items-center gap-3">
                <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
@@ -396,7 +396,7 @@ export default function StudentDashboard() {
       )}
 
       {/* Bottom Section - Attendance History */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-200 flex-grow">
+      <div className="bg-white/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-purple-900/5 flex-grow">
         <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
