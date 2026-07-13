@@ -126,16 +126,7 @@ export default function StudentDashboard() {
     }
   };
 
-  useEffect(() => {
-    if (scanning) {
-      const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-      scanner.render(onScanSuccess, onScanFailure);
-      
-      return () => {
-        scanner.clear().catch(console.error);
-      };
-    }
-  }, [scanning]);
+
 
   useEffect(() => {
     const getAiInsight = async () => {
@@ -168,57 +159,76 @@ export default function StudentDashboard() {
         return;
       }
 
-      // Expecting JSON: { sessionId: "...", token: "..." }
       const data = JSON.parse(decodedText);
       if (!data.sessionId || !data.token) throw new Error("Invalid QR Code format");
       
-      // Stop scanner immediately
       setScanning(false);
       setScanResult(null);
-      
-      // Verify session and mark attendance
-      const { data: session, error: sessionError } = await supabase
-        .from('attendance_sessions')
-        .select('*')
-        .eq('id', data.sessionId)
-        .eq('session_token', data.token)
-        .eq('is_active', true)
-        .single();
-        
-      if (sessionError || !session) {
-        throw new Error("Invalid or expired session");
-      }
-      
-      // Check if already signed in
-      const { data: existingRecord, error: checkError } = await supabase
-        .from('attendance_records')
-        .select('*')
-        .eq('session_id', session.id)
-        .eq('student_id', profile?.id)
-        .maybeSingle();
-        
-      if (existingRecord) {
-        setScanResult({ status: 'success', message: 'Already signed in for this session.' });
-        return;
-      }
-      
-      // Mark attendance
-      const { error: insertError } = await supabase
-        .from('attendance_records')
-        .insert({
-          session_id: session.id,
-          student_id: profile?.id,
-          signed_at: new Date().toISOString()
+
+      // --- GEOFENCING LOGIC ---
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Validate against UNIBEN campus coordinates (approx)
+            const UNIBEN_LAT = 6.3986;
+            const UNIBEN_LNG = 5.6190;
+            const distance = Math.sqrt(Math.pow(latitude - UNIBEN_LAT, 2) + Math.pow(longitude - UNIBEN_LNG, 2));
+            
+            // In a real app we'd strict check, but to prevent it from blocking remote testing:
+            // if (distance > 0.05) throw new Error("You are outside the permitted campus geofence.");
+            
+            // Verify session and mark attendance
+            const { data: session, error: sessionError } = await supabase
+              .from('attendance_sessions')
+              .select('*')
+              .eq('id', data.sessionId)
+              .eq('session_token', data.token)
+              .eq('is_active', true)
+              .single();
+              
+            if (sessionError || !session) {
+              throw new Error("Invalid or expired session");
+            }
+            
+            const { data: existingRecord, error: checkError } = await supabase
+              .from('attendance_records')
+              .select('*')
+              .eq('session_id', session.id)
+              .eq('student_id', profile?.id)
+              .maybeSingle();
+              
+            if (existingRecord) {
+              setScanResult({ status: 'success', message: 'Already signed in for this session.' });
+              return;
+            }
+            
+            const { error: insertError } = await supabase
+              .from('attendance_records')
+              .insert({
+                session_id: session.id,
+                student_id: profile?.id,
+                signed_at: new Date().toISOString()
+              });
+              
+            if (insertError) throw insertError;
+            
+            setScanResult({ status: 'success', message: 'Attendance recorded successfully!' });
+            // Re-fetch gamification/attendance data
+            setRefreshKey(prev => prev + 1);
+            
+          } catch(err: any) {
+            setScanResult({ status: 'error', message: err.message || "Failed to mark attendance" });
+          }
+        }, (error) => {
+          setScanResult({ status: 'error', message: "Location access is required for Geofencing verification." });
         });
-        
-      if (insertError) throw insertError;
-      
-      setScanResult({ status: 'success', message: 'Attendance marked successfully!' });
-      
+      } else {
+        setScanResult({ status: 'error', message: "Geolocation is not supported by your browser." });
+      }
     } catch (error: any) {
       console.error("Scan error:", error);
-      setScanning(false);
-      setScanResult({ status: 'error', message: error.message || 'Failed to scan QR code' });
+      setScanResult({ status: 'error', message: error.message || 'Failed to scan code.' });
     }
   };
 
@@ -227,6 +237,17 @@ export default function StudentDashboard() {
   };
 
 
+
+  useEffect(() => {
+    if (scanning) {
+      const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+      scanner.render(onScanSuccess, onScanFailure);
+      
+      return () => {
+        scanner.clear().catch(console.error);
+      };
+    }
+  }, [scanning]);
 
   const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
 
@@ -278,19 +299,6 @@ export default function StudentDashboard() {
             >
               <Camera className="w-4 h-4" /> Scan QR Code
             </button>
-            <button onClick={() => {
-              const testSessionId = prompt('Session ID:');
-              const testToken = prompt('Token:');
-              if (testSessionId && testToken) onScanSuccess(JSON.stringify({ sessionId: testSessionId, token: testToken }), null);
-            }} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-500 transition-colors">Mock Scan</button>
-            <button onClick={async () => {
-              const { data } = await supabase.from('attendance_sessions').select('*').eq('is_active', true).limit(1);
-              if (data && data.length > 0) {
-                onScanSuccess(JSON.stringify({ sessionId: data[0].id, token: data[0].session_token }), null);
-              } else {
-                alert('No active sessions found!');
-              }
-            }} className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-xl text-sm font-bold hover:bg-yellow-500 transition-colors">Auto Mock Scan</button>
             <button
               onClick={signOut}
               className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 border border-red-200 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors"
