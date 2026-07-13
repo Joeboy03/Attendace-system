@@ -9,6 +9,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import React from 'react';
+import { Toaster } from 'react-hot-toast';
+import NotificationSubscriber from './components/NotificationSubscriber';
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) => {
@@ -33,6 +35,8 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        <Toaster toastOptions={{ className: "dark:bg-[#1E172E] dark:text-purple-50 dark:border dark:border-[#2C2142]" }} />
+        <NotificationSubscriber />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

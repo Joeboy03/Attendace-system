@@ -5,6 +5,7 @@ import ThemeSwitcher from '../components/ThemeSwitcher';
 import { Course, AttendanceSession, ClassSchedule } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download, Calendar as CalendarIcon, Fingerprint } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import Calendar from '../components/Calendar';
@@ -20,6 +21,8 @@ export default function LecturerDashboard() {
   const [sessionStats, setSessionStats] = useState<any[]>([]);
   const [recentAttendees, setRecentAttendees] = useState<any[]>([]);
   const [demographicStats, setDemographicStats] = useState<{faculty: string, count: number}[]>([]);
+  const [updateMessage, setUpdateMessage] = useState('');
+  const [isPostingUpdate, setIsPostingUpdate] = useState(false);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
   const [requireGeofencing, setRequireGeofencing] = useState(false);
 
@@ -183,6 +186,31 @@ export default function LecturerDashboard() {
       setSessionStats(formattedStats);
     } catch (error) {
       console.error('Error fetching session stats:', error);
+    }
+  };
+
+  
+  const handlePostUpdate = async () => {
+    if (!selectedCourse || !updateMessage.trim()) return;
+    setIsPostingUpdate(true);
+    try {
+      const course = courses.find(c => c.id === selectedCourse);
+      await supabase.channel('uniben_updates').send({
+        type: 'broadcast',
+        event: 'lecturer_update',
+        payload: {
+          message: updateMessage,
+          course_code: course?.course_code,
+          course_id: selectedCourse
+        }
+      });
+      setUpdateMessage('');
+      toast.success('Update posted successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to post update.');
+    } finally {
+      setIsPostingUpdate(false);
     }
   };
 
@@ -441,6 +469,24 @@ export default function LecturerDashboard() {
                 <PlusCircle className="w-5 h-5 mr-2" />
                 Start Session
               </button>
+              {/* Push Update Section */}
+              <div className="mt-6 pt-6 border-t border-slate-100 dark:border-[#2C2142]/60">
+                <h3 className="text-sm font-bold text-slate-800 dark:text-purple-100 mb-3 uppercase tracking-wider">Push Announcement</h3>
+                <textarea 
+                  value={updateMessage}
+                  onChange={(e) => setUpdateMessage(e.target.value)}
+                  placeholder="e.g. Class is moving to Hall 2 today..."
+                  className="w-full p-3 text-sm border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 dark:bg-[#1E172E] text-slate-800 dark:text-purple-50 mb-3 resize-none h-20"
+                />
+                <button
+                  onClick={handlePostUpdate}
+                  disabled={!selectedCourse || !updateMessage.trim() || isPostingUpdate}
+                  className="w-full flex justify-center items-center py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                >
+                  {isPostingUpdate ? 'Posting...' : 'Push Notification'}
+                </button>
+              </div>
+  
               </>
             ) : (
               <div className="flex gap-3 mt-4">
