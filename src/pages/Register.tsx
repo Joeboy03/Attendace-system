@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { GraduationCap, UserPlus } from 'lucide-react';
+import { GraduationCap, UserPlus, Fingerprint } from 'lucide-react';
 import { UserRole } from '../types';
 import { fetchFaculties, fetchDepartments, createFaculty, createDepartment } from '../lib/departments';
 import { Faculty, Department } from '../types';
@@ -259,7 +259,7 @@ export default function Register() {
         </div>
 
         <p className="mt-8 text-center text-[11px] text-slate-500 uppercase font-bold tracking-wider">
-          © 2024 University of Benin • CSC Final Year Project
+          © 2026 University of Benin • CSC Final Year Project
         </p>
       </div>
     </div>

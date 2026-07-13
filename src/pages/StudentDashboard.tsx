@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Course, ClassSchedule } from '../types';
-import { LogOut, Camera, CheckCircle, XCircle, Calendar as CalendarIcon, Download, LayoutGrid, List, ArrowUpDown, Filter, ChevronDown, ChevronRight, Target, Award, Clock } from 'lucide-react';
+import { LogOut, Camera, CheckCircle, XCircle, Calendar as CalendarIcon, Download, LayoutGrid, List, ArrowUpDown, Filter, ChevronDown, ChevronRight, Target, Award, Clock, Fingerprint } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { fetchFaculties, fetchDepartments } from '../lib/departments';
 import { Faculty, Department } from '../types';

@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Course, AttendanceSession, ClassSchedule } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
-import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download, Calendar as CalendarIcon } from 'lucide-react';
+import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download, Calendar as CalendarIcon, Fingerprint } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import Calendar from '../components/Calendar';
 import AvatarUploader from '../components/AvatarUploader';
@@ -340,7 +340,7 @@ export default function LecturerDashboard() {
 
       <header className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-center mb-8 bg-white/80 backdrop-blur-md p-6 rounded-[2rem] shadow-xl shadow-purple-900/5 border border-white/50 relative z-10">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-900/20 transform rotate-3 hover:rotate-6 transition-transform">U</div>
+          <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-900/20 transform rotate-3 hover:rotate-6 transition-transform"><Fingerprint className="w-8 h-8 -rotate-3" /></div>
           <div>
             <h1 className="text-2xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900">University of Benin</h1>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Attendance Management System</p>
@@ -618,7 +618,7 @@ export default function LecturerDashboard() {
       </div>
 
       <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">
-        <p>© 2024 University of Benin • CSC Final Year Project</p>
+        <p>© 2026 University of Benin • CSC Final Year Project</p>
         <div className="flex gap-4">
           <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> System Online</span>
         </div>

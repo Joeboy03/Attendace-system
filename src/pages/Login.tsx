@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, Fingerprint } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -47,7 +47,7 @@ export default function Login() {
         
         <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] border border-white/40 shadow-2xl shadow-purple-900/5 p-10 flex flex-col items-center relative z-10">
           <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl flex items-center justify-center text-white mb-6 shadow-xl shadow-purple-900/20 transform rotate-3 hover:rotate-6 transition-transform">
-            <GraduationCap className="w-10 h-10 -rotate-3" />
+            <Fingerprint className="w-10 h-10 -rotate-3" />
           </div>
           
           <h2 className="text-3xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900 mb-2">
@@ -109,7 +109,7 @@ export default function Login() {
         </div>
 
         <p className="mt-8 text-center text-[11px] text-slate-500 uppercase font-bold tracking-wider">
-          © 2024 University of Benin • CSC Final Year Project
+          © 2026 University of Benin • CSC Final Year Project
         </p>
       </div>
     </div>
