@@ -10,6 +10,7 @@ export interface User {
   level?: string;
   faculty?: string;
   department?: string;
+  avatar_url?: string;
   created_at: string;
 }
 

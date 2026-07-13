@@ -7,6 +7,7 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { fetchFaculties, fetchDepartments } from '../lib/departments';
 import { Faculty, Department } from '../types';
 import Calendar from '../components/Calendar';
+import AvatarUploader from '../components/AvatarUploader';
 import { fetchSchedules } from '../lib/schedules';
 
 export default function StudentDashboard() {
@@ -167,6 +168,7 @@ export default function StudentDashboard() {
         .maybeSingle();
         
       if (existingRecord) {
+        setScanResult({ status: 'success', message: 'Already signed in for this session.' });
         return;
       }
       
@@ -175,14 +177,18 @@ export default function StudentDashboard() {
         .from('attendance_records')
         .insert({
           session_id: session.id,
-          student_id: profile?.id
+          student_id: profile?.id,
+          signed_at: new Date().toISOString()
         });
-        if (insertError) throw insertError;
+        
+      if (insertError) throw insertError;
       
+      setScanResult({ status: 'success', message: 'Attendance marked successfully!' });
       
     } catch (error: any) {
       console.error("Scan error:", error);
       setScanning(false);
+      setScanResult({ status: 'error', message: error.message || 'Failed to scan QR code' });
     }
   };
 
@@ -242,6 +248,19 @@ export default function StudentDashboard() {
             >
               <Camera className="w-4 h-4" /> Scan QR Code
             </button>
+            <button onClick={() => {
+              const testSessionId = prompt('Session ID:');
+              const testToken = prompt('Token:');
+              if (testSessionId && testToken) onScanSuccess(JSON.stringify({ sessionId: testSessionId, token: testToken }), null);
+            }} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-500 transition-colors">Mock Scan</button>
+            <button onClick={async () => {
+              const { data } = await supabase.from('attendance_sessions').select('*').eq('is_active', true).limit(1);
+              if (data && data.length > 0) {
+                onScanSuccess(JSON.stringify({ sessionId: data[0].id, token: data[0].session_token }), null);
+              } else {
+                alert('No active sessions found!');
+              }
+            }} className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-xl text-sm font-bold hover:bg-yellow-500 transition-colors">Auto Mock Scan</button>
             <button
               onClick={signOut}
               className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 border border-red-200 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors"
@@ -253,9 +272,7 @@ export default function StudentDashboard() {
 
         <div className="flex flex-col lg:flex-row gap-8 items-start mb-8">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-purple-900 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-inner">
-              {profile?.full_name?.charAt(0) || 'U'}
-            </div>
+            <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Student"} size="lg" />
             <div>
               <h3 className="text-xl font-bold text-purple-900 mb-3">{profile?.full_name || 'Student Name'}</h3>
               <div className="flex flex-wrap gap-x-12 gap-y-4">
@@ -318,7 +335,35 @@ export default function StudentDashboard() {
             </div>
           </div>
         </div>
-      </div>
+      
+        {/* Attendance Breakdown */}
+        <div className="mt-8 border-t border-slate-200 pt-8">
+          <h4 className="text-lg font-bold text-purple-900 mb-4">Course Attendance Summary</h4>
+          {enrolledCourses.length === 0 ? (
+            <p className="text-sm text-slate-500">You are not enrolled in any courses yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {enrolledCourses.map(enrollment => {
+                const courseCode = enrollment.courses?.course_code;
+                const courseTitle = enrollment.courses?.course_title;
+                const attended = attendanceHistory.filter(record => record.attendance_sessions?.courses?.course_code === courseCode).length;
+                return (
+                  <div key={enrollment.id} className="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex justify-between items-center hover:border-purple-300 transition-colors">
+                    <div>
+                      <p className="font-bold text-purple-900">{courseCode}</p>
+                      <p className="text-xs text-slate-500 truncate max-w-[150px]">{courseTitle}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-black text-purple-900">{attended}</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Attended</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+</div>
 
       {/* QR Scanner Modal / Section */}
       {scanning && (

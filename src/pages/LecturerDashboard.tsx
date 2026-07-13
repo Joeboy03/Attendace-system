@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { LogOut, QrCode, Users, PlusCircle, TrendingUp, Download, Calendar as CalendarIcon } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import Calendar from '../components/Calendar';
+import AvatarUploader from '../components/AvatarUploader';
 import { fetchSchedules } from '../lib/schedules';
 
 export default function LecturerDashboard() {
@@ -19,6 +20,20 @@ export default function LecturerDashboard() {
   const [recentAttendees, setRecentAttendees] = useState<any[]>([]);
   const [demographicStats, setDemographicStats] = useState<{faculty: string, count: number}[]>([]);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
+
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (activeSession && selectedCourse) {
+      interval = setInterval(() => {
+        fetchRecentAttendees(selectedCourse);
+        fetchSessionStats(selectedCourse);
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activeSession, selectedCourse]);
 
   useEffect(() => {
     fetchCourses();
@@ -99,7 +114,7 @@ export default function LecturerDashboard() {
         .from('attendance_records')
         .select(`
           id,
-          scanned_at,
+          signed_at,
           users (
             full_name,
             matric_number,
@@ -109,7 +124,7 @@ export default function LecturerDashboard() {
           )
         `)
         .eq('session_id', sessionId)
-        .order('scanned_at', { ascending: false })
+        .order('signed_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;
@@ -238,7 +253,7 @@ export default function LecturerDashboard() {
         .from('attendance_records')
         .select(`
           id,
-          scanned_at,
+          signed_at,
           users (
             full_name,
             matric_number,
@@ -248,7 +263,7 @@ export default function LecturerDashboard() {
           )
         `)
         .eq('session_id', sessionId)
-        .order('scanned_at', { ascending: false });
+        .order('signed_at', { ascending: false });
 
       if (error) throw error;
       if (!data || data.length === 0) {
@@ -269,7 +284,7 @@ export default function LecturerDashboard() {
             `"${record.users?.level || 'N/A'}"`,
             `"${record.users?.faculty || 'N/A'}"`,
             `"${record.users?.department || 'N/A'}"`,
-            `"${format(new Date(record.scanned_at), 'h:mm:ss a')}"`,
+            `"${((record.signed_at && !isNaN(new Date(record.signed_at).getTime())) ? format(new Date(record.signed_at), 'h:mm:ss a') : 'N/A')}"`,
             '"PRESENT"'
           ].join(','))
         ].join('\n');
@@ -297,7 +312,7 @@ export default function LecturerDashboard() {
           record.users?.matric_number || 'N/A',
           record.users?.level || 'N/A',
           record.users?.department || 'N/A',
-          format(new Date(record.scanned_at), 'h:mm:ss a'),
+          ((record.signed_at && !isNaN(new Date(record.signed_at).getTime())) ? format(new Date(record.signed_at), 'h:mm:ss a') : 'N/A'),
           'PRESENT'
         ]);
         
@@ -328,6 +343,7 @@ export default function LecturerDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-6">
+          <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Lecturer"} size="sm" />
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-slate-800">{profile?.full_name}</p>
             <p className="text-xs text-purple-600 font-medium">Lecturer</p>
@@ -572,7 +588,7 @@ export default function LecturerDashboard() {
                           <span className="text-[10px] font-medium text-slate-500">{record.users?.level || 'N/A'}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-xs font-medium text-slate-500">{format(new Date(record.scanned_at), 'h:mm:ss a')}</td>
+                      <td className="p-4 text-xs font-medium text-slate-500">{((record.signed_at && !isNaN(new Date(record.signed_at).getTime())) ? format(new Date(record.signed_at), 'h:mm:ss a') : 'N/A')}</td>
                       <td className="p-4 text-right">
                         <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md">PRESENT</span>
                       </td>

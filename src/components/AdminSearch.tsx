@@ -235,10 +235,10 @@ export default function AdminSearch() {
                     <div className="text-right">
                       <div className="flex items-center justify-end text-xs font-semibold text-slate-700 mb-1">
                         <Clock className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                        {format(new Date(result.signed_at), 'MMM d, yyyy')}
+                        {((result.signed_at && !isNaN(new Date(result.signed_at).getTime())) ? format(new Date(result.signed_at), 'MMM d, yyyy') : 'N/A')}
                       </div>
                       <div className="text-[10px] text-slate-500 font-medium">
-                        {format(new Date(result.signed_at), 'h:mm a')}
+                        {((result.signed_at && !isNaN(new Date(result.signed_at).getTime())) ? format(new Date(result.signed_at), 'h:mm a') : 'N/A')}
                       </div>
                     </div>
                   </>

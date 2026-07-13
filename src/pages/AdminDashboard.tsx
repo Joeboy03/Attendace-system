@@ -5,6 +5,7 @@ import { LogOut, Shield, Users, UserPlus, BookOpen, PlusCircle, GraduationCap, C
 import Calendar from '../components/Calendar';
 import AdminSearch from '../components/AdminSearch';
 import AdminDepartments from '../components/AdminDepartments';
+import AvatarUploader from '../components/AvatarUploader';
 import { ClassSchedule } from '../types';
 import { fetchSchedules, createSchedule } from '../lib/schedules';
 
@@ -29,6 +30,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ students: 0, lecturers: 0, courses: 0, admins: 0 });
   const [admins, setAdmins] = useState<any[]>([]);
   const [lecturers, setLecturers] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
   
   const [newCourseCode, setNewCourseCode] = useState('');
@@ -80,6 +82,9 @@ export default function AdminDashboard() {
       // Fetch lecturers for the dropdown
       const { data: lecturerData } = await supabase.from('users').select('*').eq('role', 'lecturer');
       if (lecturerData) setLecturers(lecturerData);
+
+      const { data: studentData } = await supabase.from('users').select('*').eq('role', 'student').order('created_at', { ascending: false }).limit(100);
+      if (studentData) setStudents(studentData);
 
       // Fetch courses
       const { data: courseData } = await supabase.from('courses').select('*, lecturer:lecturer_id(full_name)').order('created_at', { ascending: false });
@@ -181,6 +186,18 @@ export default function AdminDashboard() {
     }
   };
 
+  
+  const handleDeleteStudent = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this student?")) return;
+    try {
+      const { error } = await supabase.from('users').delete().eq('id', id);
+      if (error) throw error;
+      fetchDashboardData();
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete student');
+    }
+  };
+
   const handleDeleteLecturer = async (id: string) => {
 
     if (!window.confirm("Are you sure you want to delete this lecturer?")) return;
@@ -267,6 +284,7 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-6">
+          <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Admin"} size="sm" />
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-slate-800">{profile?.full_name}</p>
             <p className="text-xs text-purple-600 font-medium flex items-center justify-end"><Shield className="w-3 h-3 mr-1" /> Administrator</p>
@@ -305,6 +323,46 @@ export default function AdminDashboard() {
         <div className="xl:col-span-12">
           <AdminSearch />
         </div>
+        
+        {/* Student Directory */}
+        <div className="xl:col-span-12 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+           <div className="flex justify-between items-center mb-6">
+             <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Student Directory</h2>
+             <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
+                {students.length} STUDENTS
+             </span>
+           </div>
+           {students.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow overflow-y-auto pr-2">
+              {students.map((student) => (
+                <div key={student.id} className="p-4 bg-white/10 border-2 border-white/10 rounded-2xl flex items-center justify-between hover:border-white/30 transition-colors">
+                  <div>
+                    <div className="flex items-center space-x-3 mb-1">
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-900 text-[10px] font-black rounded-md">{student.matric_number || 'NO MATRIC'}</span>
+                      <p className="text-sm font-bold text-white truncate max-w-[150px]">{student.full_name}</p>
+                    </div>
+                    <p className="text-xs font-medium text-purple-200 truncate max-w-[200px]">{student.email}</p>
+                    <p className="text-[10px] text-purple-300 mt-1 uppercase tracking-widest font-bold">{student.level} • {student.department}</p>
+                  </div>
+                  <button 
+                    onClick={() => handleDeleteStudent(student.id)}
+                    className="p-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/40 transition-colors flex-shrink-0"
+                    title="Delete Student"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex-grow flex flex-col items-center justify-center text-purple-300 opacity-70">
+              <GraduationCap className="w-16 h-16 mb-4" />
+              <p className="text-sm font-bold text-center">No students registered yet.</p>
+            </div>
+          )}
+        </div>
+
+
         {/* Department Management Section */}
         <div className="xl:col-span-12">
           <AdminDepartments />
