@@ -210,6 +210,18 @@ export default function AdminDashboard() {
     }
   };
 
+
+  const handleDeleteCourse = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this course? This will also delete related attendance records and schedules.")) return;
+    try {
+      const { error } = await supabase.from('courses').delete().eq('id', id);
+      if (error) throw error;
+      fetchDashboardData();
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete course');
+    }
+  };
+
   const handleCreateCourse = async (e: React.FormEvent) => {
 
     e.preventDefault();
@@ -664,6 +676,13 @@ export default function AdminDashboard() {
                       {course.lecturer?.full_name || 'Unassigned'}
                     </p>
                   </div>
+                  <button 
+                    onClick={() => handleDeleteCourse(course.id)}
+                    className="p-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/40 transition-colors flex-shrink-0"
+                    title="Delete Course"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
             </div>
