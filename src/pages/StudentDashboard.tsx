@@ -45,6 +45,13 @@ export default function StudentDashboard() {
       setDepartmentsList([]);
     }
   }, [profileForm.faculty, facultiesList]);
+  
+  const [points, setPoints] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const [profileUpdateMsg, setProfileUpdateMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   useEffect(() => {
@@ -57,7 +64,7 @@ export default function StudentDashboard() {
         department: profile.department || ''
       });
     }
-  }, [profile]);
+  }, [profile, refreshKey]);
 
   useEffect(() => {
     fetchEnrollments();
@@ -124,7 +131,31 @@ export default function StudentDashboard() {
       const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
       scanner.render(onScanSuccess, onScanFailure);
       
-      return () => {
+    
+  useEffect(() => {
+    const getAiInsight = async () => {
+      if (!profile) return;
+      setInsightLoading(true);
+      try {
+        const response = await fetch('/api/ai/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ attendanceHistory, studentInfo: profile })
+        });
+        const result = await response.json();
+        setAiInsight(result.prediction);
+      } catch(e) {
+         console.error(e);
+      } finally {
+        setInsightLoading(false);
+      }
+    };
+    if (attendanceHistory.length > 0) {
+      getAiInsight();
+    }
+  }, [attendanceHistory.length]);
+
+  return () => {
         scanner.clear().catch(console.error);
       };
     }
