@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { GraduationCap, UserPlus, Fingerprint } from 'lucide-react';
@@ -106,22 +107,25 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-600 font-sans p-6 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B090F] text-slate-600 dark:text-purple-300 font-sans p-6 flex flex-col items-center justify-center">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeSwitcher />
+      </div>
       <div className="w-full max-w-md">
         
-        <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">
-          <div className="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-purple-600 mb-6 transform -rotate-3">
+        <div className="bg-white dark:bg-[#15111D] rounded-3xl border border-slate-200 dark:border-[#2C2142] p-8 shadow-sm dark:shadow-none flex flex-col items-center">
+          <div className="w-16 h-16 bg-white dark:bg-[#15111D] border border-slate-200 dark:border-[#2C2142] rounded-2xl flex items-center justify-center text-purple-600 mb-6 transform -rotate-3">
             <UserPlus className="w-8 h-8 rotate-3" />
           </div>
           
           <h2 className="text-2xl font-bold tracking-tight text-purple-900 mb-1">Student Registration</h2>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-8">
+          <p className="text-xs text-slate-500 dark:text-purple-400 font-bold uppercase tracking-wider mb-8">
             Attendance Management System
           </p>
           
           <form className="w-full space-y-4" onSubmit={handleRegister}>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                 Full Name
               </label>
               <input
@@ -129,13 +133,13 @@ export default function Register() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 bg-slate-50 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 placeholder-slate-400 bg-slate-50 dark:bg-[#0B090F] transition-colors"
                 placeholder="e.g. John Doe"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                 Email address
               </label>
               <input
@@ -143,13 +147,13 @@ export default function Register() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 bg-slate-50 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 placeholder-slate-400 bg-slate-50 dark:bg-[#0B090F] transition-colors"
                 placeholder="school@student.uniben.edu"
               />
             </div>
 
             <div className="mb-4">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                     Matric Number
                 </label>
                 <input
@@ -157,20 +161,20 @@ export default function Register() {
                     required
                     value={matricNumber}
                     onChange={(e) => setMatricNumber(e.target.value)}
-                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 bg-slate-50 transition-colors"
+                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 placeholder-slate-400 bg-slate-50 dark:bg-[#0B090F] transition-colors"
                     placeholder="CSC170..."
                 />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
                 <div className="mb-4">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                         Level
                     </label>
                     <select
                         value={level}
                         onChange={(e) => setLevel(e.target.value)}
-                        className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-purple-900 transition-colors appearance-none"
+                        className="w-full pl-4 pr-10 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-purple-900 transition-colors appearance-none"
                     >
                         <option value="100 Level">100 Level</option>
                         <option value="200 Level">200 Level</option>
@@ -181,7 +185,7 @@ export default function Register() {
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                         Faculty
                     </label>
                     <input
@@ -191,7 +195,7 @@ export default function Register() {
                         value={faculty}
                         onChange={(e) => { setFaculty(e.target.value); setDepartment(''); }}
                         placeholder="Type faculty name"
-                        className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-purple-900 transition-colors"
+                        className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-purple-900 transition-colors"
                     />
                     <datalist id="faculty-list">
                         {facultiesList.map(fac => (
@@ -202,7 +206,7 @@ export default function Register() {
             </div>
             
             <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                     Department
                 </label>
                 <input
@@ -212,7 +216,7 @@ export default function Register() {
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     placeholder="Type department name"
-                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-purple-900 transition-colors disabled:opacity-50"
+                    className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-purple-900 transition-colors disabled:opacity-50"
                     disabled={!faculty}
                 />
                 <datalist id="dept-list">
@@ -223,7 +227,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-2">
+              <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2 mt-2">
                 Password
               </label>
               <input
@@ -231,13 +235,13 @@ export default function Register() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 bg-slate-50 transition-colors"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 placeholder-slate-400 bg-slate-50 dark:bg-[#0B090F] transition-colors"
                 placeholder="Create a password"
               />
             </div>
 
             {error && (
-              <div className="text-red-700 bg-red-100 border border-red-200 p-3 rounded-xl text-sm font-medium mt-4">
+              <div className="text-red-700 bg-red-100 dark:bg-red-900/30 border border-red-200 p-3 rounded-xl text-sm font-medium mt-4">
                 {error}
               </div>
             )}
@@ -258,7 +262,7 @@ export default function Register() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-[11px] text-slate-500 uppercase font-bold tracking-wider">
+        <p className="mt-8 text-center text-[11px] text-slate-500 dark:text-purple-400 uppercase font-bold tracking-wider">
           © 2026 University of Benin • CSC Final Year Project
         </p>
       </div>

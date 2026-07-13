@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 import { Course, AttendanceSession, ClassSchedule } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
@@ -353,31 +354,32 @@ export default function LecturerDashboard() {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-bold">Loading dashboard...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0B090F] text-slate-500 dark:text-purple-400 font-bold">Loading dashboard...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 sm:p-6 lg:p-8 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 font-sans p-4 sm:p-6 lg:p-8 flex flex-col relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-100/50 to-transparent pointer-events-none" />
-      <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-300/20 blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-100/50 dark:from-purple-900/20 to-transparent pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-300/20 dark:bg-purple-500/10 blur-[100px] pointer-events-none" />
 
       <header className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-center mb-8 bg-white/80 backdrop-blur-md p-6 rounded-[2rem] shadow-xl shadow-purple-900/5 border border-white/50 relative z-10">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-900/20 transform rotate-3 hover:rotate-6 transition-transform"><Fingerprint className="w-8 h-8 -rotate-3" /></div>
           <div>
-            <h1 className="text-2xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900">University of Benin</h1>
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Attendance Management System</p>
+            <h1 className="text-2xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900 dark:text-purple-50">University of Benin</h1>
+            <p className="text-xs text-slate-500 dark:text-purple-400 font-medium uppercase tracking-wider">Attendance Management System</p>
           </div>
         </div>
         <div className="flex items-center gap-6">
           <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Lecturer"} size="sm" />
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-slate-800">{profile?.full_name}</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-purple-100">{profile?.full_name}</p>
             <p className="text-xs text-purple-600 font-medium">Lecturer</p>
           </div>
+          <ThemeSwitcher />
           <button 
             onClick={signOut}
-            className="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 hover:text-red-700 transition-colors shadow-sm"
+            className="w-12 h-12 bg-red-50 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center hover:bg-red-100 dark:bg-red-900/30 hover:text-red-700 transition-colors shadow-sm dark:shadow-none"
             title="Sign Out"
           >
             <LogOut className="w-5 h-5" />
@@ -388,18 +390,18 @@ export default function LecturerDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 flex-grow">
         
         {/* Manage Class / Active Session Control */}
-        <div className="md:col-span-1 xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
+        <div className="md:col-span-1 xl:col-span-1 bg-white dark:bg-[#15111D] rounded-3xl border-2 border-slate-200 dark:border-[#2C2142] p-6 flex flex-col justify-between shadow-sm dark:shadow-none">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-purple-100 mb-4 flex items-center">
             <Users className="w-5 h-5 mr-2 text-purple-500" />
             Manage Class
           </h2>
           <div className="space-y-4 flex-grow flex flex-col justify-center">
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider text-xs">
+              <label className="block text-sm font-bold text-slate-700 dark:text-purple-200 mb-2 uppercase tracking-wider text-xs">
                 Select Course
               </label>
               <select
-                className="w-full pl-4 pr-10 py-3 text-base border-2 border-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 font-medium text-slate-800"
+                className="w-full pl-4 pr-10 py-3 text-base border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] font-medium text-slate-800 dark:text-purple-100"
                 value={selectedCourse}
                 onChange={(e) => {
                   setSelectedCourse(e.target.value);
@@ -425,16 +427,16 @@ export default function LecturerDashboard() {
                   id="geofenceToggle"
                   checked={requireGeofencing}
                   onChange={(e) => setRequireGeofencing(e.target.checked)}
-                  className="w-4 h-4 text-purple-600 rounded border-slate-300 focus:ring-purple-500"
+                  className="w-4 h-4 text-purple-600 rounded border-slate-300 dark:border-[#3A2D54] focus:ring-purple-500"
                 />
-                <label htmlFor="geofenceToggle" className="text-sm font-medium text-slate-700">
+                <label htmlFor="geofenceToggle" className="text-sm font-medium text-slate-700 dark:text-purple-200">
                   Add geofencing
                 </label>
               </div>
               <button
                 onClick={handleStartSession}
                 disabled={!selectedCourse}
-                className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-purple-900 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors"
+                className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-sm dark:shadow-none text-sm font-bold text-white bg-purple-900 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors"
               >
                 <PlusCircle className="w-5 h-5 mr-2" />
                 Start Session
@@ -458,13 +460,13 @@ export default function LecturerDashboard() {
           {activeSession ? (
             <>
               <div className="flex justify-between items-center w-full mb-6">
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full flex items-center">
+                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold rounded-full flex items-center">
                   <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse mr-2"></span>
                   LIVE
                 </span>
                 <span className="text-purple-200 text-xs font-mono font-bold bg-black/20 px-3 py-1 rounded-full">Expires: {format(new Date(activeSession.expires_at), 'h:mm a')}</span>
               </div>
-              <div className="bg-white p-4 rounded-2xl mb-4 shadow-xl">
+              <div className="bg-white dark:bg-[#15111D] p-4 rounded-2xl mb-4 shadow-xl">
                 <div className="border-4 border-slate-900 flex items-center justify-center rounded-xl overflow-hidden p-2">
                   <QRCodeSVG 
                     value={JSON.stringify({ 
@@ -487,14 +489,14 @@ export default function LecturerDashboard() {
         </div>
 
         {/* Attendance Trends */}
-        <div className="md:col-span-2 xl:col-span-2 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col">
+        <div className="md:col-span-2 xl:col-span-2 bg-white dark:bg-[#15111D] rounded-3xl border-2 border-slate-200 dark:border-[#2C2142] p-6 shadow-sm dark:shadow-none flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-purple-100 uppercase tracking-widest flex items-center">
               <TrendingUp className="w-4 h-4 mr-2 text-purple-500" />
               Attendance Trends
             </h2>
             {selectedCourse && (
-              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold text-slate-500 dark:text-purple-400 bg-slate-100 dark:bg-[#1E172E] px-3 py-1 rounded-full">
                 {courses.find(c => c.id === selectedCourse)?.course_code}
               </span>
             )}
@@ -543,7 +545,7 @@ export default function LecturerDashboard() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-400 font-medium text-sm border-2 border-dashed border-slate-200 rounded-2xl">
+              <div className="h-full flex items-center justify-center text-slate-400 dark:text-purple-500 font-medium text-sm border-2 border-dashed border-slate-200 dark:border-[#2C2142] rounded-2xl">
                 No attendance data available for this course yet.
               </div>
             )}
@@ -551,9 +553,9 @@ export default function LecturerDashboard() {
         </div>
 
         {/* Faculty Demographics */}
-        <div className="md:col-span-2 xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col min-h-[250px]">
+        <div className="md:col-span-2 xl:col-span-1 bg-white dark:bg-[#15111D] rounded-3xl border-2 border-slate-200 dark:border-[#2C2142] p-6 shadow-sm dark:shadow-none flex flex-col min-h-[250px]">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-purple-100 uppercase tracking-widest flex items-center">
               <Users className="w-4 h-4 mr-2 text-purple-500" />
               Faculty Breakdown
             </h2>
@@ -562,11 +564,11 @@ export default function LecturerDashboard() {
             {demographicStats.length > 0 ? (
               demographicStats.sort((a, b) => b.count - a.count).map((stat, i) => (
                 <div key={i}>
-                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                  <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-purple-200 mb-1">
                     <span className="truncate max-w-[150px]">{stat.faculty}</span>
                     <span>{stat.count}</span>
                   </div>
-                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-[#1E172E] h-2 rounded-full overflow-hidden">
                     <div 
                       className="bg-purple-500 h-full rounded-full" 
                       style={{ width: `${(stat.count / Math.max(...demographicStats.map(s => s.count))) * 100}%` }}
@@ -575,7 +577,7 @@ export default function LecturerDashboard() {
                 </div>
               ))
             ) : (
-              <div className="text-center text-slate-400 font-medium text-sm">
+              <div className="text-center text-slate-400 dark:text-purple-500 font-medium text-sm">
                 No demographics.
               </div>
             )}
@@ -583,20 +585,20 @@ export default function LecturerDashboard() {
         </div>
 
         {/* Real-time Log */}
-        <div className="md:col-span-2 xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden flex flex-col shadow-sm min-h-[250px]">
-          <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+        <div className="md:col-span-2 xl:col-span-3 bg-white dark:bg-[#15111D] rounded-3xl border-2 border-slate-200 dark:border-[#2C2142] overflow-hidden flex flex-col shadow-sm dark:shadow-none min-h-[250px]">
+          <div className="p-5 border-b border-slate-100 dark:border-[#2C2142]/60 bg-slate-50/50 flex justify-between items-center">
             <div className="flex items-center">
-              <h3 className="font-bold text-slate-800 text-sm uppercase tracking-widest flex items-center">
+              <h3 className="font-bold text-slate-800 dark:text-purple-100 text-sm uppercase tracking-widest flex items-center">
                 <Users className="w-4 h-4 mr-2 text-purple-500" />
                 Class Participation Log
               </h3>
               {activeSession && <span className="animate-pulse w-2.5 h-2.5 bg-green-500 rounded-full ml-3"></span>}
             </div>
             <div className="flex gap-2">
-              <button onClick={() => handleExport('csv')} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+              <button onClick={() => handleExport('csv')} className="px-3 py-1.5 bg-white dark:bg-[#15111D] border border-slate-200 dark:border-[#2C2142] text-slate-600 dark:text-purple-300 text-[10px] font-bold rounded-lg hover:bg-slate-50 dark:hover:bg-[#1E172E] dark:bg-[#0B090F] transition-colors flex items-center shadow-sm dark:shadow-none">
                 <Download className="w-3 h-3 mr-1" /> CSV
               </button>
-              <button onClick={() => handleExport('pdf')} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+              <button onClick={() => handleExport('pdf')} className="px-3 py-1.5 bg-white dark:bg-[#15111D] border border-slate-200 dark:border-[#2C2142] text-slate-600 dark:text-purple-300 text-[10px] font-bold rounded-lg hover:bg-slate-50 dark:hover:bg-[#1E172E] dark:bg-[#0B090F] transition-colors flex items-center shadow-sm dark:shadow-none">
                 <Download className="w-3 h-3 mr-1" /> PDF
               </button>
             </div>
@@ -604,40 +606,40 @@ export default function LecturerDashboard() {
           <div className="flex-grow overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Student Name</th>
-                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Matric Number</th>
-                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Level & Dept</th>
-                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider">Time Scanned</th>
-                  <th className="p-4 text-[10px] text-slate-400 uppercase font-bold tracking-wider text-right">Status</th>
+                <tr className="border-b border-slate-100 dark:border-[#2C2142]/60">
+                  <th className="p-4 text-[10px] text-slate-400 dark:text-purple-500 uppercase font-bold tracking-wider">Student Name</th>
+                  <th className="p-4 text-[10px] text-slate-400 dark:text-purple-500 uppercase font-bold tracking-wider">Matric Number</th>
+                  <th className="p-4 text-[10px] text-slate-400 dark:text-purple-500 uppercase font-bold tracking-wider">Level & Dept</th>
+                  <th className="p-4 text-[10px] text-slate-400 dark:text-purple-500 uppercase font-bold tracking-wider">Time Scanned</th>
+                  <th className="p-4 text-[10px] text-slate-400 dark:text-purple-500 uppercase font-bold tracking-wider text-right">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {recentAttendees.length > 0 ? (
                   recentAttendees.map((record, i) => (
                     <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                      <td className="p-4 text-sm font-bold text-slate-800 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 text-xs font-bold">
+                      <td className="p-4 text-sm font-bold text-slate-800 dark:text-purple-100 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-700 text-xs font-bold">
                           {record.users?.full_name?.charAt(0) || '?'}
                         </div>
                         {record.users?.full_name || 'Unknown'}
                       </td>
-                      <td className="p-4 text-xs font-medium text-slate-600">{record.users?.matric_number || 'N/A'}</td>
+                      <td className="p-4 text-xs font-medium text-slate-600 dark:text-purple-300">{record.users?.matric_number || 'N/A'}</td>
                       <td className="p-4">
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-slate-700">{record.users?.department || 'N/A'}</span>
-                          <span className="text-[10px] font-medium text-slate-500">{record.users?.level || 'N/A'}</span>
+                          <span className="text-xs font-bold text-slate-700 dark:text-purple-200">{record.users?.department || 'N/A'}</span>
+                          <span className="text-[10px] font-medium text-slate-500 dark:text-purple-400">{record.users?.level || 'N/A'}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-xs font-medium text-slate-500">{((record.signed_at && !isNaN(new Date(record.signed_at).getTime())) ? format(new Date(record.signed_at), 'h:mm:ss a') : 'N/A')}</td>
+                      <td className="p-4 text-xs font-medium text-slate-500 dark:text-purple-400">{((record.signed_at && !isNaN(new Date(record.signed_at).getTime())) ? format(new Date(record.signed_at), 'h:mm:ss a') : 'N/A')}</td>
                       <td className="p-4 text-right">
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md">PRESENT</span>
+                        <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold rounded-md">PRESENT</span>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-400 font-medium text-sm">
+                    <td colSpan={5} className="p-8 text-center text-slate-400 dark:text-purple-500 font-medium text-sm">
                       No recent attendance records found.
                     </td>
                   </tr>
@@ -650,11 +652,11 @@ export default function LecturerDashboard() {
       </div>
 
       <div className="mt-4">
-        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">My Class Schedule</h2>
+        <h2 className="text-sm font-bold text-slate-800 dark:text-purple-100 uppercase tracking-widest mb-4">My Class Schedule</h2>
         <Calendar schedules={schedules} />
       </div>
 
-      <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+      <footer className="mt-6 flex justify-between items-center text-[11px] text-slate-400 dark:text-purple-500 uppercase font-bold tracking-wider">
         <p>© 2026 University of Benin • CSC Final Year Project</p>
         <div className="flex gap-4">
           <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> System Online</span>

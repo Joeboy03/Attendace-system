@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
   const { user, profile, loading } = useAuth();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-bold uppercase tracking-widest text-sm">Loading UNIBEN Attendance System...</div>;
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0B090F] text-slate-500 dark:text-purple-400 font-bold uppercase tracking-widest text-sm">Loading UNIBEN Attendance System...</div>;
   }
 
   if (!user || !profile) {

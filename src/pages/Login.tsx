@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
@@ -39,7 +40,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-50 text-slate-600 font-sans p-6 flex flex-col items-center justify-center">
+    <div className="min-h-screen relative overflow-hidden bg-slate-50 dark:bg-[#0B090F] text-slate-600 dark:text-purple-300 font-sans p-6 flex flex-col items-center justify-center">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeSwitcher />
+      </div>
       {/* Background decorations */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-300/30 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/30 blur-[100px] pointer-events-none" />
@@ -50,16 +54,16 @@ export default function Login() {
             <Fingerprint className="w-10 h-10 -rotate-3" />
           </div>
           
-          <h2 className="text-3xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900 mb-2">
+          <h2 className="text-3xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900 dark:text-purple-50 mb-2">
             University of Benin
           </h2>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-8">
+          <p className="text-xs text-slate-500 dark:text-purple-400 font-bold uppercase tracking-wider mb-8">
             Attendance Management System
           </p>
           
           <form className="w-full space-y-5" onSubmit={handleLogin}>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                 Email address
               </label>
               <input
@@ -67,12 +71,12 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-5 pr-5 py-4 text-sm font-medium border-2 border-slate-100 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 rounded-2xl bg-slate-50/50 text-slate-900 placeholder-slate-400 transition-all"
+                className="w-full pl-5 pr-5 py-4 text-sm font-medium border-2 border-slate-100 dark:border-[#2C2142]/60 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 rounded-2xl bg-slate-50/50 text-slate-900 dark:text-purple-50 placeholder-slate-400 transition-all"
                 placeholder="Enter your email"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-500 dark:text-purple-400 uppercase tracking-wider mb-2">
                 Password
               </label>
               <input
@@ -80,13 +84,13 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-5 pr-5 py-4 text-sm font-medium border-2 border-slate-100 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 rounded-2xl bg-slate-50/50 text-slate-900 placeholder-slate-400 transition-all"
+                className="w-full pl-5 pr-5 py-4 text-sm font-medium border-2 border-slate-100 dark:border-[#2C2142]/60 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 rounded-2xl bg-slate-50/50 text-slate-900 dark:text-purple-50 placeholder-slate-400 transition-all"
                 placeholder="Enter your password"
               />
             </div>
 
             {error && (
-              <div className="text-red-700 bg-red-100 border border-red-200 p-3 rounded-xl text-sm font-medium">
+              <div className="text-red-700 bg-red-100 dark:bg-red-900/30 border border-red-200 p-3 rounded-xl text-sm font-medium">
                 {error}
               </div>
             )}
@@ -100,15 +104,15 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 text-center w-full pt-6 border-t border-slate-200">
-            <p className="text-sm text-slate-500 font-medium mb-2">New to the system?</p>
+          <div className="mt-6 text-center w-full pt-6 border-t border-slate-200 dark:border-[#2C2142]">
+            <p className="text-sm text-slate-500 dark:text-purple-400 font-medium mb-2">New to the system?</p>
             <Link to="/register" className="text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors">
                 Create a Student Account
             </Link>
           </div>
         </div>
 
-        <p className="mt-8 text-center text-[11px] text-slate-500 uppercase font-bold tracking-wider">
+        <p className="mt-8 text-center text-[11px] text-slate-500 dark:text-purple-400 uppercase font-bold tracking-wider">
           © 2026 University of Benin • CSC Final Year Project
         </p>
       </div>
