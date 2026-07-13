@@ -336,7 +336,7 @@ export default function StudentDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 flex-grow relative z-10">
         
         {/* Left Column: Student Profile & Stats */}
-        <div className="xl:col-span-3 flex flex-col gap-6">
+        <div className="md:col-span-2 xl:col-span-3 flex flex-col gap-6">
           {/* Profile Card */}
           <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="flex items-center gap-6">
@@ -481,7 +481,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Right Column: AI Insights & Scanning */}
-      <div className="xl:col-span-1 flex flex-col gap-6">
+      <div className="md:col-span-2 xl:col-span-1 flex flex-col gap-6">
         
         {/* QR Scanner Section (always visible on desktop, modal on mobile) */}
         {scanning && (

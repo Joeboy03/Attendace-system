@@ -336,12 +336,12 @@ export default function AdminDashboard() {
         </div>
         
         {/* Unified Search Section */}
-        <div className="xl:col-span-12">
+        <div className="md:col-span-2 xl:col-span-12">
           <AdminSearch />
         </div>
         
         {/* Student Directory */}
-        <div className="xl:col-span-12 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="md:col-span-2 xl:col-span-12 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
              <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Student Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
@@ -380,13 +380,13 @@ export default function AdminDashboard() {
 
 
         {/* Department Management Section */}
-        <div className="xl:col-span-12">
+        <div className="md:col-span-2 xl:col-span-12">
           <AdminDepartments />
         </div>
         
         
         {/* Create Admin Form */}
-        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
+        <div className="md:col-span-2 xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Create Admin</h2>
           
           {adminMessage.text && (
@@ -446,7 +446,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Admin Directory */}
-        <div className="xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="md:col-span-2 xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
              <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Admin Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
@@ -484,7 +484,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Create Lecturer Form */}
-        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
+        <div className="md:col-span-2 xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Create Lecturer</h2>
           
           {lecturerMessage.text && (
@@ -556,7 +556,7 @@ export default function AdminDashboard() {
 
 
         {/* Lecturer Directory */}
-        <div className="xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="md:col-span-2 xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
              <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Lecturer Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
@@ -594,7 +594,7 @@ export default function AdminDashboard() {
 
         {/* Create Course Form */}
 
-        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
+        <div className="md:col-span-2 xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Create New Course</h2>
           
           {message.text && (
@@ -658,7 +658,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Course List */}
-        <div className="xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
+        <div className="md:col-span-2 xl:col-span-8 bg-purple-900 rounded-3xl p-6 shadow-lg flex flex-col min-h-[400px]">
            <div className="flex justify-between items-center mb-6">
              <h2 className="text-sm font-bold text-purple-100 uppercase tracking-widest">Course Directory</h2>
              <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
@@ -702,7 +702,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mt-4">
         {/* Schedule Class Form */}
-        <div className="xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
+        <div className="md:col-span-2 xl:col-span-4 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col shadow-sm">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6">Schedule Class</h2>
           
           {scheduleMessage.text && (
@@ -785,7 +785,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Calendar View */}
-        <div className="xl:col-span-8">
+        <div className="md:col-span-2 xl:col-span-8">
           <Calendar schedules={schedules} />
         </div>
       </div>

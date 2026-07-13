@@ -388,7 +388,7 @@ export default function LecturerDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 flex-grow">
         
         {/* Manage Class / Active Session Control */}
-        <div className="xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+        <div className="md:col-span-1 xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col justify-between shadow-sm">
           <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
             <Users className="w-5 h-5 mr-2 text-purple-500" />
             Manage Class
@@ -428,7 +428,7 @@ export default function LecturerDashboard() {
                   className="w-4 h-4 text-purple-600 rounded border-slate-300 focus:ring-purple-500"
                 />
                 <label htmlFor="geofenceToggle" className="text-sm font-medium text-slate-700">
-                  Require Dynamic Geofencing
+                  Add geofencing
                 </label>
               </div>
               <button
@@ -454,7 +454,7 @@ export default function LecturerDashboard() {
         </div>
 
         {/* QR Code Display */}
-        <div className="xl:col-span-1 bg-purple-900 rounded-3xl p-6 flex flex-col items-center justify-center shadow-lg min-h-[300px]">
+        <div className="md:col-span-1 xl:col-span-1 bg-purple-900 rounded-3xl p-6 flex flex-col items-center justify-center shadow-lg min-h-[300px]">
           {activeSession ? (
             <>
               <div className="flex justify-between items-center w-full mb-6">
@@ -487,7 +487,7 @@ export default function LecturerDashboard() {
         </div>
 
         {/* Attendance Trends */}
-        <div className="xl:col-span-2 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col">
+        <div className="md:col-span-2 xl:col-span-2 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center">
               <TrendingUp className="w-4 h-4 mr-2 text-purple-500" />
@@ -551,7 +551,7 @@ export default function LecturerDashboard() {
         </div>
 
         {/* Faculty Demographics */}
-        <div className="xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col min-h-[250px]">
+        <div className="md:col-span-2 xl:col-span-1 bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col min-h-[250px]">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center">
               <Users className="w-4 h-4 mr-2 text-purple-500" />
@@ -583,7 +583,7 @@ export default function LecturerDashboard() {
         </div>
 
         {/* Real-time Log */}
-        <div className="xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden flex flex-col shadow-sm min-h-[250px]">
+        <div className="md:col-span-2 xl:col-span-3 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden flex flex-col shadow-sm min-h-[250px]">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
             <div className="flex items-center">
               <h3 className="font-bold text-slate-800 text-sm uppercase tracking-widest flex items-center">
