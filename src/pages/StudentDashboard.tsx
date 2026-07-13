@@ -303,58 +303,68 @@ export default function StudentDashboard() {
     fetchAttendanceHistory();
   }, [profile]);
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-600 font-sans p-6 flex flex-col gap-6">
-      
-      {/* Top Section - Student Profile */}
-      <div className="bg-white/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-purple-900/5">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
-            <h2 className="text-xl font-bold text-purple-900">Student Profile</h2>
-          </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors text-purple-900">
-              This Year <ChevronDown className="w-4 h-4 text-slate-500" />
-            </button>
-            <button 
-              onClick={() => setScanning(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-900 text-white rounded-xl text-sm font-bold hover:bg-purple-800 transition-colors"
-            >
-              <Camera className="w-4 h-4" /> Scan QR Code
-            </button>
-            <button
-              onClick={signOut}
-              className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 border border-red-200 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors"
-            >
-              <LogOut className="w-4 h-4" /> Sign Out
-            </button>
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 sm:p-6 lg:p-8 flex flex-col relative overflow-hidden gap-6">
+      {/* Background decorations */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-100/50 to-transparent pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-300/20 blur-[100px] pointer-events-none" />
+
+      <header className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-center bg-white/80 backdrop-blur-md p-6 rounded-[2rem] shadow-xl shadow-purple-900/5 border border-white/50 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-900/20 transform rotate-3 hover:rotate-6 transition-transform"><Fingerprint className="w-8 h-8 -rotate-3" /></div>
+          <div>
+            <h1 className="text-2xl font-[Space_Grotesk] font-bold tracking-tight text-slate-900">University of Benin</h1>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Attendance Management System</p>
           </div>
         </div>
+        <div className="flex items-center gap-6">
+          <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Student"} size="sm" />
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-semibold text-slate-800">{profile?.full_name}</p>
+            <p className="text-xs text-purple-600 font-medium">{profile?.matric_number}</p>
+          </div>
+          <button 
+            onClick={signOut}
+            className="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 hover:text-red-700 transition-colors shadow-sm"
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start mb-8">
-          <div className="flex items-center gap-6">
-            <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Student"} size="lg" />
-            <div>
-              <h3 className="text-xl font-bold text-purple-900 mb-3">{profile?.full_name || 'Student Name'}</h3>
-              <div className="flex flex-wrap gap-x-12 gap-y-4">
-                <div>
-                  <p className="text-xs text-slate-500 mb-1">Matric Number</p>
-                  <p className="text-sm font-medium text-purple-900">{profile?.matric_number || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-1">Level / Department</p>
-                  <p className="text-sm font-medium text-purple-900">{profile?.level} • {profile?.department || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-1">Email Address</p>
-                  <p className="text-sm font-medium text-purple-900">{profile?.email || 'N/A'}</p>
+      {/* Main Content Area */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 flex-grow relative z-10">
+        
+        {/* Left Column: Student Profile & Stats */}
+        <div className="xl:col-span-3 flex flex-col gap-6">
+          {/* Profile Card */}
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <AvatarUploader userId={profile?.id || ""} name={profile?.full_name || "Student"} size="lg" />
+              <div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">{profile?.full_name || 'Student Name'}</h3>
+                <div className="flex flex-wrap gap-x-8 gap-y-2">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Level</span>
+                    <span className="text-sm font-semibold text-purple-900">{profile?.level || 'N/A'}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Department</span>
+                    <span className="text-sm font-semibold text-purple-900">{profile?.department || 'N/A'}</span>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <button 
+              onClick={() => setScanning(true)}
+              className="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-purple-900 text-white rounded-xl text-sm font-bold hover:bg-purple-800 transition-colors shadow-md"
+            >
+              <Camera className="w-5 h-5" /> Scan QR Code
+            </button>
           </div>
-        </div>
 
-        {/* Stats row */}
+          {/* Stats row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-2xl p-4 flex items-center gap-4 border border-slate-200">
             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-slate-500">
@@ -399,7 +409,10 @@ export default function StudentDashboard() {
       
         {/* Attendance Breakdown */}
         <div className="mt-8 border-t border-slate-200 pt-8">
-          <h4 className="text-lg font-bold text-purple-900 mb-4">Course Attendance Summary</h4>
+          <h4 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
+             <Target className="w-5 h-5 mr-2 text-purple-500" />
+             Course Attendance Summary
+          </h4>
           {enrolledCourses.length === 0 ? (
             <p className="text-sm text-slate-500">You are not enrolled in any courses yet.</p>
           ) : (
@@ -424,121 +437,103 @@ export default function StudentDashboard() {
             </div>
           )}
         </div>
-</div>
-
-      {/* QR Scanner Modal / Section */}
-      {scanning && (
-        <div className="bg-white/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-purple-900/5">
-          <div className="flex justify-between items-center mb-6">
-             <div className="flex items-center gap-3">
-               <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
-               <h2 className="text-xl font-bold text-purple-900">Scan Class QR Code</h2>
-             </div>
-             <button onClick={() => setScanning(false)} className="text-slate-500 hover:text-purple-900">
-               <XCircle className="w-6 h-6" />
-             </button>
-          </div>
-          
-          {scanResult && (
-            <div className={`mb-6 p-4 rounded-xl flex items-start ${scanResult.status === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
-              {scanResult.status === 'success' ? (
-                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
-              ) : (
-                <XCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
-              )}
-              <p className="font-medium text-sm">{scanResult.message}</p>
-            </div>
-          )}
-
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mx-auto max-w-md">
-            <div id="reader" className="w-full rounded-xl overflow-hidden [&>div]:border-none [&_video]:rounded-xl text-slate-600"></div>
-          </div>
-        </div>
-      )}
-
-      {/* Bottom Section - Attendance History */}
-      <div className="bg-white/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-purple-900/5 flex-grow">
-        <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div>
-            <h2 className="text-xl font-bold text-purple-900">Attendance History</h2>
-          </div>
-          
-          <div className="flex gap-3">
-            <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200">
-              <button className="p-2 rounded-lg bg-white text-purple-900">
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button className="p-2 rounded-lg text-slate-500 hover:text-purple-900">
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors text-purple-900">
-              <ArrowUpDown className="w-4 h-4" /> Sort
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors text-purple-900">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {attendanceHistory.length === 0 ? (
-             <div className="col-span-full py-12 text-center text-slate-500">
-               No attendance records found.
-             </div>
-          ) : (
-            attendanceHistory.map(record => {
-              const date = new Date(record.signed_at);
-              const formattedDate = date.toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
-              const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-              
-              // We'll just assume "On Time" for now since we don't have the class start time readily available in this loop without joining differently, but we can simulate it or just use "On Time".
-              const status = "On Time";
-              
-              return (
-                <div key={record.id} className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-purple-300 transition-colors">
-                  <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-2 text-purple-900 font-medium">
-                      <CalendarIcon className="w-4 h-4 text-slate-500" />
-                      {formattedDate}
-                    </div>
-                    <span className="px-3 py-1 bg-purple-900/10 text-purple-600 text-xs font-bold rounded-full">
-                      {status}
-                    </span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs text-slate-500 mb-1">Course Code</p>
-                      <p className="text-sm font-bold text-purple-900">{record.attendance_sessions?.courses?.course_code || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 mb-1">Check In Time</p>
-                      <p className="text-sm font-bold text-purple-900">{formattedTime}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
         
-        {/* Pagination placeholder */}
-        {attendanceHistory.length > 0 && (
-          <div className="flex justify-center mt-8 gap-2">
-            {[1, 2, 3, 4, '...', 8, 9, 10].map((page, idx) => (
-              <button 
-                key={idx} 
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium ${page === 1 ? 'border border-slate-600 text-purple-900' : 'text-slate-500 hover:text-purple-900'}`}
-              >
-                {page}
-              </button>
-            ))}
+        {/* Bottom Section - Attendance History */}
+        <div className="mt-8 border-t border-slate-200 pt-8">
+          <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <h4 className="text-lg font-bold text-slate-800 flex items-center">
+              <CalendarIcon className="w-5 h-5 mr-2 text-purple-500" />
+              Recent Attendance
+            </h4>
           </div>
-        )}
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {attendanceHistory.length === 0 ? (
+               <div className="col-span-full py-8 text-center text-slate-500">
+                 No attendance records found.
+               </div>
+            ) : (
+              attendanceHistory.slice(0, 6).map(record => {
+                const date = new Date(record.signed_at);
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                
+                return (
+                  <div key={record.id} className="bg-white rounded-2xl p-4 border border-slate-200 flex flex-col justify-between hover:border-purple-300 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
+                       <div>
+                         <p className="font-bold text-purple-900">{record.attendance_sessions?.courses?.course_code || 'N/A'}</p>
+                         <p className="text-xs text-slate-500 truncate max-w-[150px]">{record.attendance_sessions?.courses?.course_title || 'N/A'}</p>
+                       </div>
+                       <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md uppercase tracking-wider">Present</span>
+                    </div>
+                    <div className="flex justify-between items-end mt-4 pt-4 border-t border-slate-100">
+                       <p className="text-xs font-medium text-slate-600 flex items-center"><CalendarIcon className="w-3 h-3 mr-1"/> {formattedDate}</p>
+                       <p className="text-xs font-medium text-slate-600 flex items-center"><Clock className="w-3 h-3 mr-1"/> {formattedTime}</p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
       </div>
 
+      {/* Right Column: AI Insights & Scanning */}
+      <div className="xl:col-span-1 flex flex-col gap-6">
+        
+        {/* QR Scanner Section (always visible on desktop, modal on mobile) */}
+        {scanning && (
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+               <h2 className="text-lg font-bold text-slate-800 flex items-center">
+                 <Camera className="w-5 h-5 mr-2 text-purple-500" />
+                 Scan Class QR
+               </h2>
+               <button onClick={() => setScanning(false)} className="text-slate-400 hover:text-red-500 transition-colors">
+                 <XCircle className="w-5 h-5" />
+               </button>
+            </div>
+            
+            {scanResult && (
+              <div className={`mb-6 p-4 rounded-xl flex items-start ${scanResult.status === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
+                {scanResult.status === 'success' ? (
+                  <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                ) : (
+                  <XCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                )}
+                <p className="font-medium text-sm">{scanResult.message}</p>
+              </div>
+            )}
+            
+            <div className="bg-slate-50 p-2 rounded-2xl border border-slate-200 mx-auto w-full max-w-[280px]">
+              <div id="reader" className="w-full rounded-xl overflow-hidden [&>div]:border-none [&_video]:rounded-xl text-slate-600"></div>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col min-h-[250px]">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
+          <div className="relative z-10 flex flex-col h-full justify-between">
+            <div>
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-4">
+                <LayoutGrid className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="text-lg font-bold mb-2">AI Attendance Insights</h2>
+              <p className="text-purple-200 text-sm leading-relaxed mb-6">
+                {aiInsight || "Attend more classes to generate personalized AI insights about your performance and attendance patterns."}
+              </p>
+            </div>
+            <button className="w-full py-3 px-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-xl text-sm font-bold transition-colors">
+              Refresh Insights
+            </button>
+          </div>
+        </div>
+
+      </div>
+      
     </div>
+  </div>
   );
 }

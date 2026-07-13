@@ -189,7 +189,7 @@ export default function LecturerDashboard() {
     if (!selectedCourse || !profile) return;
     
     const uuid = crypto.randomUUID();
-    let sessionToken = uuid;
+    let sessionToken: string = uuid;
 
     if (requireGeofencing) {
       if ("geolocation" in navigator) {
