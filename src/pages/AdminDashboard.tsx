@@ -36,6 +36,8 @@ export default function AdminDashboard() {
   
   const [newCourseCode, setNewCourseCode] = useState('');
   const [newCourseTitle, setNewCourseTitle] = useState('');
+  const [newCourseFaculty, setNewCourseFaculty] = useState('');
+  const [newCourseDepartment, setNewCourseDepartment] = useState('');
   const [selectedLecturer, setSelectedLecturer] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -230,17 +232,36 @@ export default function AdminDashboard() {
     setMessage({ type: '', text: '' });
 
     try {
-      const { error } = await supabase.from('courses').insert({
+      
+      let insertData = {
         course_code: newCourseCode.toUpperCase(),
         course_title: newCourseTitle,
-        lecturer_id: selectedLecturer || null
-      });
+        lecturer_id: selectedLecturer || null,
+        faculty: newCourseFaculty,
+        department: newCourseDepartment
+      };
+      
+      let { error } = await supabase.from('courses').insert(insertData);
+      
+      if (error && error.code === 'PGRST204') {
+        // Fallback if columns not added to supabase yet
+        delete insertData.faculty;
+        delete insertData.department;
+        const fallback = await supabase.from('courses').insert(insertData);
+        error = fallback.error;
+        if (!error) {
+           alert("Course created, but faculty/department were ignored because columns are missing in Supabase. Please add 'faculty' and 'department' columns to the 'courses' table.");
+        }
+      }
+
 
       if (error) throw error;
 
       setMessage({ type: 'success', text: 'Course created successfully!' });
       setNewCourseCode('');
       setNewCourseTitle('');
+      setNewCourseFaculty('');
+      setNewCourseDepartment('');
       setSelectedLecturer('');
       fetchDashboardData(); // Refresh data
     } catch (error: any) {
@@ -633,6 +654,40 @@ export default function AdminDashboard() {
                 className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 placeholder-slate-400 transition-colors"
               />
             </div>
+            
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-purple-200 uppercase tracking-wider mb-2">Faculty (Optional for generic)</label>
+              <select
+                value={newCourseFaculty}
+                onChange={(e) => setNewCourseFaculty(e.target.value)}
+                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 transition-colors appearance-none"
+              >
+                <option value="">Select Faculty...</option>
+                <option value="Physical Sciences">Physical Sciences</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Life Sciences">Life Sciences</option>
+                <option value="Arts">Arts</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Management Sciences">Management Sciences</option>
+                <option value="Education">Education</option>
+                <option value="Law">Law</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Pharmacy">Pharmacy</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Environmental Sciences">Environmental Sciences</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-purple-200 uppercase tracking-wider mb-2">Department (Optional)</label>
+              <input
+                type="text"
+                value={newCourseDepartment}
+                onChange={(e) => setNewCourseDepartment(e.target.value)}
+                placeholder="e.g. Computer Science"
+                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 placeholder-slate-400 transition-colors"
+              />
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-purple-200 uppercase tracking-wider mb-2">Assign Lecturer</label>
               <select

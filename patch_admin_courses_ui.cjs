@@ -1,39 +1,27 @@
 const fs = require('fs');
 let content = fs.readFileSync('src/pages/AdminDashboard.tsx', 'utf8');
 
-if (!content.includes('newCourseFaculty')) {
-  // 1. Add state variables
-  content = content.replace(
-    "const [newCourseTitle, setNewCourseTitle] = useState('');",
-    "const [newCourseTitle, setNewCourseTitle] = useState('');\n  const [newCourseFaculty, setNewCourseFaculty] = useState('');\n  const [newCourseDepartment, setNewCourseDepartment] = useState('');"
-  );
-
-  // 2. Add to insert
-  content = content.replace(
-    "course_title: newCourseTitle,",
-    "course_title: newCourseTitle,\n        faculty: newCourseFaculty,\n        department: newCourseDepartment,"
-  );
-
-  // 3. Clear on success
-  content = content.replace(
-    "setNewCourseTitle('');",
-    "setNewCourseTitle('');\n      setNewCourseFaculty('');\n      setNewCourseDepartment('');"
-  );
-
-  // 4. Add UI inputs
-  const uiToAdd = `
+const uiToAdd = `
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-purple-200 uppercase tracking-wider mb-2">Faculty (Optional for generic)</label>
               <select
                 value={newCourseFaculty}
                 onChange={(e) => setNewCourseFaculty(e.target.value)}
-                className="w-full pl-4 pr-4 py-3 text-sm font-medium border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 transition-colors"
+                className="w-full pl-4 pr-10 py-3 text-sm font-medium border-2 border-slate-200 dark:border-[#2C2142] focus:outline-none focus:border-purple-500 rounded-xl bg-slate-50 dark:bg-[#0B090F] text-slate-900 dark:text-purple-50 transition-colors appearance-none"
               >
                 <option value="">Select Faculty...</option>
                 <option value="Physical Sciences">Physical Sciences</option>
                 <option value="Engineering">Engineering</option>
                 <option value="Life Sciences">Life Sciences</option>
                 <option value="Arts">Arts</option>
+                <option value="Social Sciences">Social Sciences</option>
+                <option value="Management Sciences">Management Sciences</option>
+                <option value="Education">Education</option>
+                <option value="Law">Law</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Pharmacy">Pharmacy</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Environmental Sciences">Environmental Sciences</option>
               </select>
             </div>
             <div>
@@ -48,10 +36,9 @@ if (!content.includes('newCourseFaculty')) {
             </div>
 `;
   
-  content = content.replace(
-    /(<div>\s*<label[^>]*>Lecturer<\/label>)/,
-    uiToAdd + "\n            $1"
-  );
+content = content.replace(
+  /(<div>\s*<label[^>]*>Assign Lecturer<\/label>)/,
+  uiToAdd + "\n            $1"
+);
 
-  fs.writeFileSync('src/pages/AdminDashboard.tsx', content);
-}
+fs.writeFileSync('src/pages/AdminDashboard.tsx', content);

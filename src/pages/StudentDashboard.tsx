@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import { Course, ClassSchedule } from '../types';
-import { LogOut, Camera, CheckCircle, XCircle, Calendar as CalendarIcon, Download, LayoutGrid, List, ArrowUpDown, Filter, ChevronDown, ChevronRight, Target, Award, Clock, Fingerprint } from 'lucide-react';
+import { LogOut, PlusCircle, Camera, CheckCircle, XCircle, Calendar as CalendarIcon, Download, LayoutGrid, List, ArrowUpDown, Filter, ChevronDown, ChevronRight, Target, Award, Clock, Fingerprint } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { fetchFaculties, fetchDepartments } from '../lib/departments';
 import { Faculty, Department } from '../types';
@@ -19,6 +20,10 @@ export default function StudentDashboard() {
   const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
   const [scanResult, setScanResult] = useState<{ status: 'success' | 'error', message: string } | null>(null);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
+  const [availableCourses, setAvailableCourses] = useState<any[]>([]);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [selectedCourseToRegister, setSelectedCourseToRegister] = useState('');
+  const [filterDepartment, setFilterDepartment] = useState(profile?.department || '');
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -96,6 +101,47 @@ export default function StudentDashboard() {
     } catch (error: any) {
       setProfileUpdateMsg({ type: 'error', text: error.message || 'Failed to update profile' });
       console.error('Error updating profile:', error);
+    }
+  };
+
+  
+  const fetchAvailableCourses = async () => {
+    try {
+      const { data, error } = await supabase.from('courses').select('*').order('course_code', { ascending: true });
+      if (data) setAvailableCourses(data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  
+  useEffect(() => {
+    fetchAvailableCourses();
+  }, []);
+  
+  const handleRegisterCourse = async () => {
+    if (!selectedCourseToRegister || !profile) return;
+    setIsRegistering(true);
+    try {
+      // check if already enrolled
+      if (enrolledCourses.find(c => c.course_id === selectedCourseToRegister)) {
+        toast.error('Already registered for this course');
+        setIsRegistering(false);
+        return;
+      }
+      
+      const { error } = await supabase.from('enrollments').insert({
+        student_id: profile.id,
+        course_id: selectedCourseToRegister
+      });
+      if (error) throw error;
+      toast.success('Successfully registered for course!');
+      fetchEnrollments();
+      setSelectedCourseToRegister('');
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to register course');
+    } finally {
+      setIsRegistering(false);
     }
   };
 

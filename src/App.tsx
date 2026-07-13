@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import NotificationSubscriber from './components/NotificationSubscriber';
+import OfflineIndicator from './components/OfflineIndicator';
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) => {
@@ -37,6 +38,7 @@ export default function App() {
       <Router>
         <Toaster toastOptions={{ className: "dark:bg-[#1E172E] dark:text-purple-50 dark:border dark:border-[#2C2142]" }} />
         <NotificationSubscriber />
+        <OfflineIndicator />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
