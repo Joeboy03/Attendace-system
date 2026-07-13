@@ -15,6 +15,7 @@ export default function StudentDashboard() {
   const { profile, signOut, refreshProfile } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [scanning, setScanning] = useState(false);
+  const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
   const [scanResult, setScanResult] = useState<{ status: 'success' | 'error', message: string } | null>(null);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
 
@@ -176,7 +177,7 @@ export default function StudentDashboard() {
             const distance = Math.sqrt(Math.pow(latitude - UNIBEN_LAT, 2) + Math.pow(longitude - UNIBEN_LNG, 2));
             
             // In a real app we'd strict check, but to prevent it from blocking remote testing:
-            // if (distance > 0.05) throw new Error("You are outside the permitted campus geofence.");
+            if (distance > 0.05) throw new Error("You are outside the permitted campus geofence. You must be on the UNIBEN campus to sign in.");
             
             // Verify session and mark attendance
             const { data: session, error: sessionError } = await supabase
@@ -249,7 +250,7 @@ export default function StudentDashboard() {
     }
   }, [scanning]);
 
-  const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
+
 
   useEffect(() => {
     const fetchAttendanceHistory = async () => {
