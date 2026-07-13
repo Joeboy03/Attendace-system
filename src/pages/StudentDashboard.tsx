@@ -131,7 +131,12 @@ export default function StudentDashboard() {
       const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
       scanner.render(onScanSuccess, onScanFailure);
       
-    
+      return () => {
+        scanner.clear().catch(console.error);
+      };
+    }
+  }, [scanning]);
+
   useEffect(() => {
     const getAiInsight = async () => {
       if (!profile) return;
@@ -154,12 +159,6 @@ export default function StudentDashboard() {
       getAiInsight();
     }
   }, [attendanceHistory.length]);
-
-  return () => {
-        scanner.clear().catch(console.error);
-      };
-    }
-  }, [scanning]);
 
   const onScanSuccess = async (decodedText: string, decodedResult: any) => {
     try {
